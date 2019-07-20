@@ -22,5 +22,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-**/grades.csv
-**/secrets.py
+/cached/grades.csv
+/server/secrets.py
