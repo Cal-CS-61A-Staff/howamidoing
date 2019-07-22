@@ -1,23 +1,34 @@
 /* eslint-disable react/no-array-index-key */
 import React from "react";
-import { Row } from "./Row.js";
+import Topic from "./Topic.js";
 
-export function GradeTable(props) {
-    const headerElems = ["Assignment", "Points"];
-    const header = headerElems.map((elem, index) => <th scope="col" key={index}>{elem}</th>);
-
-    const rows = props.assignments.map((elem, index) => (
-        <Row
-            name={elem.name}
-            score={elem.score}
+export default function GradeTable(props) {
+    const rows = props.schema.map((elem, index) => (
+        <Topic
+            schema={elem}
+            data={props.data}
+            planned={props.planned}
+            indent={0}
             key={index}
+            future={props.future}
+            onFutureScoreChange={props.onFutureScoreChange}
         />
     ));
 
+    const scoreHeader = props.future ? "Expected / Maximum score eventually possible" :
+        "Current / Maximum score possible so far";
+
     return (
-        <table className="table">
-            { header }
-            { rows }
+        <table className="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col" style={{ width: "50%" }}>Assignment</th>
+                    <th scope="col" style={{ width: "25%" }}>{scoreHeader}</th>
+                </tr>
+            </thead>
+            <tbody>
+                { rows }
+            </tbody>
         </table>
     );
 }

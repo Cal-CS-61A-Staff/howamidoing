@@ -2,6 +2,7 @@
 If you are running OK Locally, make sure you are using different
 hostnames for the two apps (otherwise Flask will clobber your session)
 """
+import os
 import csv
 import urllib.parse
 from werkzeug import security
@@ -13,6 +14,9 @@ import requests
 from server.secrets import SECRET
 
 CONSUMER_KEY = "61a-grade-view"
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+GRADES_PATH = os.path.join(BASE_DIR, "../cached/grades.csv")
 
 
 def create_client(app):
@@ -44,22 +48,26 @@ def create_client(app):
         return uri, headers, body
     remote.pre_request = check_req
 
-    @app.route('/')
-    def index():
+    @app.route('/query')
+    def query():
         if 'dev_token' in session:
             ret = remote.get('user', token=session['dev_token'])
             email = ret.data['data']['email']
-            with open("./cached/grades.csv") as grades:
+            email = "chris.landgrebe31@berkeley.edu"
+            with open(GRADES_PATH) as grades:
                 reader = csv.reader(grades)
                 header = next(reader)
                 for row in reader:
                     if row[0] == email:
                         return jsonify({
+                            "success": True,
                             "header": header,
                             "data": row,
                         })
 
-        return "Not logged in!"
+        return jsonify({
+            "success": False,
+        })
 
     @app.route('/login')
     def login():
@@ -69,7 +77,7 @@ def create_client(app):
     @app.route('/logout')
     def logout():
         session.pop('dev_token', None)
-        return redirect(url_for('index'))
+        return redirect(url_for('query'))
 
     @app.route('/authorized')
     def authorized():
@@ -80,8 +88,7 @@ def create_client(app):
             )
         if isinstance(resp, dict) and 'access_token' in resp:
             session['dev_token'] = (resp['access_token'], '')
-            return jsonify(resp)
-        return str(resp)
+        return redirect("/query")
 
     @app.route('/user')
     def client_method():
@@ -102,7 +109,6 @@ if __name__ == '__main__':
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
     # DEBUG=1 python oauth2_client.py
     app = Flask(__name__)
-    app.debug = True
     app.secret_key = 'development'
     create_client(app)
     app.run(host='127.0.0.1', port=8000)
