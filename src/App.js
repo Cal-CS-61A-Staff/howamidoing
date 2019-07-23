@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign,dot-notation */
 import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
@@ -81,15 +81,39 @@ const ASSIGNMENTS = [
         ]),
     ]),
     Topic("Participation Credits", [
-        Topic("Discussion", [
+        Topic("Discussion Attendance", [
             ...range(2).map(i => Assignment(`Discussion ${i} (Total)`, 1)),
-            ...range(2, 10).map(i => Future(Assignment(`Discussion ${i} (Total)`, 1))),
-        ], 10),
-    ]),
+            ...range(2, 14).map(i => Future(Assignment(`Discussion ${i} (Total)`, 1))),
+        ]),
+        Topic("Lab Attendance", [
+            ...range(14).map(i => Future(Assignment(`Discussion ${i} (Total)`, 1))),
+        ]),
+    ], 20),
 ];
 
-function copy(scores) {
-    return JSON.parse(JSON.stringify(scores));
+const LOOKUP = {};
+
+for (const assignment of ASSIGNMENTS) {
+    initializeLookup(assignment);
+}
+
+function initializeLookup(assignment) {
+    LOOKUP[assignment.name] = assignment;
+    if (assignment.isTopic) {
+        for (const child of assignment.children) {
+            initializeLookup(child);
+        }
+    }
+}
+
+function extend(scores) {
+    const out = JSON.parse(JSON.stringify(scores));
+    for (const key of Object.keys(LOOKUP)) {
+        if (out[key] === undefined) {
+            out[key] = NaN;
+        }
+    }
+    return out;
 }
 
 class App extends Component {
@@ -110,16 +134,40 @@ class App extends Component {
                 scores[header[i]] = data[i];
             }
         }
-        this.setState({ scores, plannedScores: copy(scores) });
+        this.setState({ scores, plannedScores: extend(scores) });
     }
 
     handleFutureCheckboxChange = () => {
-        this.setState(state => ({ future: !state.future, plannedScores: copy(state.scores) }));
+        this.setState(state => ({ future: !state.future, plannedScores: extend(state.scores) }));
     };
 
     handleFutureScoreChange = (name, newScore) => {
         this.state.plannedScores[name] = newScore === "" ? NaN : newScore;
         this.forceUpdate(); // sorry!
+    };
+
+    recursivelyMaximize = (topic, plannedScores) => {
+        if (!topic.isTopic) {
+            if (Number.isNaN(plannedScores[topic.name])) {
+                plannedScores[topic.name] = topic.maxScore;
+            }
+        } else {
+            for (const child of topic.children) {
+                this.recursivelyMaximize(child, plannedScores);
+            }
+        }
+    };
+
+    handleSetCourseworkToMax = () => {
+        this.recursivelyMaximize(LOOKUP["Homework"], this.state.plannedScores);
+        this.recursivelyMaximize(LOOKUP["Projects"], this.state.plannedScores);
+        this.recursivelyMaximize(LOOKUP["Lab"], this.state.plannedScores);
+        this.forceUpdate();
+    };
+
+    handleSetParticipationToMax = () => {
+        this.recursivelyMaximize(LOOKUP["Participation Credits"], this.state.plannedScores);
+        this.forceUpdate();
     };
 
     computeTotals(curr, scores, totals) {
@@ -135,6 +183,13 @@ class App extends Component {
         for (const child of curr.children) {
             out += this.computeTotals(child, scores, totals);
         }
+
+        const limit = this.state.future ? curr.futureMaxScore : curr.maxScore;
+
+        if (limit) {
+            out = Math.min(out, limit);
+        }
+
         totals[curr.name] = out;
 
         if (scores[curr.name] !== undefined
@@ -174,7 +229,8 @@ class App extends Component {
                         {this.state.future && (
                             <GradePlanner
                                 data={plannedTotals}
-                                onSetMax={this.setAllMax}
+                                onSetCourseworkToMax={this.handleSetCourseworkToMax}
+                                onSetParticipationToMax={this.handleSetParticipationToMax}
                             />
                         )}
                         <GradeTable

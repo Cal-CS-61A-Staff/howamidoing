@@ -50,24 +50,25 @@ def create_client(app):
 
     @app.route('/query')
     def query():
-        if 'dev_token' in session:
-            ret = remote.get('user', token=session['dev_token'])
-            email = ret.data['data']['email']
-            email = "chris.landgrebe31@berkeley.edu"
-            with open(GRADES_PATH) as grades:
-                reader = csv.reader(grades)
-                header = next(reader)
-                for row in reader:
-                    if row[0] == email:
-                        return jsonify({
-                            "success": True,
-                            "header": header,
-                            "data": row,
-                        })
-
-        return jsonify({
-            "success": False,
-        })
+        try:
+            if 'dev_token' in session:
+                ret = remote.get('user', token=session['dev_token'])
+                email = ret.data['data']['email']
+                email = "chris.landgrebe31@berkeley.edu"
+                with open(GRADES_PATH) as grades:
+                    reader = csv.reader(grades)
+                    header = next(reader)
+                    for row in reader:
+                        if row[0] == email:
+                            return jsonify({
+                                "success": True,
+                                "header": header,
+                                "data": row,
+                            })
+        except:
+            return jsonify({
+                "success": False,
+            })
 
     @app.route('/login')
     def login():

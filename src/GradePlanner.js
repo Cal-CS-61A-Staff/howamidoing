@@ -1,4 +1,5 @@
 import React from "react";
+import FinalNeededScoreTable from "./FinalNeededScoreTable.js";
 
 const BINS = [294, 283, 270, 255, 230, 215, 200, 190, 180, 175, 170, 165, 0];
 const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"];
@@ -20,7 +21,7 @@ export default function GradePlanner(props) {
                             Or click the button to set them all to the maximum (including extra
                             credit)!
                         </p>
-                        <button className="btn btn-primary" type="button">
+                        <button className="btn btn-primary" type="button" onClick={props.onSetCourseworkToMax}>
                             Set all unknown non-exam scores to maximum
                         </button>
                     </div>
@@ -43,23 +44,22 @@ export default function GradePlanner(props) {
         }
     }
 
-    const gradeWithoutFinal = GRADES[needed.length - 1];
-
     if (!participation) {
         return (
             <>
                 <div className="card">
                     <h5 className="card-header">Grade Planning</h5>
                     <div className="card-body">
-                        <h5 className="card-title">Grade Forecast:</h5>
+                        <FinalNeededScoreTable
+                            grades={GRADES}
+                            needed={needed}
+                        />
                         <p className="card-text">
-                            If you skip the final, you will receive a {gradeWithoutFinal}.
-
                             To take exam recovery points into account, specify
                             an estimate of your participation credits. Or click the button to set
                             them all to the maximum!
                         </p>
-                        <button className="btn btn-primary" type="button">
+                        <button className="btn btn-primary" type="button" onClick={props.onSetParticipationToMax}>
                             Set all unknown participation credits to maximum
                         </button>
                     </div>
@@ -68,22 +68,27 @@ export default function GradePlanner(props) {
             </>
         );
     } else {
+        const recoveredMidtermPoints = examRecovery(Midterm, participation, 60, 20);
+        for (let rawFinalScore = 0; rawFinalScore <= 80; ++rawFinalScore) {
+
+        }
         return (
             <>
                 <div className="card">
                     <h5 className="card-header">Grade Planning</h5>
                     <div className="card-body">
-                        <h5 className="card-title">Grade Forecast:</h5>
-                        <p className="card-text">
-                            If you skip the final, you will receive a(n)
-                            {" "}
-                            {gradeWithoutFinal}
-                            .
-                        </p>
+                        <FinalNeededScoreTable
+                            grades={GRADES}
+                            needed={needed}
+                        />
                     </div>
                 </div>
                 <br />
             </>
         );
     }
+}
+
+function examRecovery(examScore, participation, maxExamScore, recoveryCap) {
+
 }
