@@ -21,7 +21,11 @@ export default function GradePlanner(props) {
                             Or click the button to set them all to the maximum (including extra
                             credit)!
                         </p>
-                        <button className="btn btn-primary" type="button" onClick={props.onSetCourseworkToMax}>
+                        <button
+                            className="btn btn-primary"
+                            type="button"
+                            onClick={props.onSetCourseworkToMax}
+                        >
                             Set all unknown non-exam scores to maximum
                         </button>
                     </div>
@@ -35,16 +39,17 @@ export default function GradePlanner(props) {
     const participation = props.data["Participation Credits"];
 
     const totalNonFinal = Midterm + Homework + Projects + Lab;
-    const needed = [];
-
-    for (const bin of BINS) {
-        needed.push(Math.max(0, bin - totalNonFinal));
-        if (needed[needed.length - 1] === 0) {
-            break;
-        }
-    }
 
     if (!participation) {
+        const needed = [];
+
+        for (const bin of BINS) {
+            needed.push(Math.max(0, bin - totalNonFinal));
+            if (needed[needed.length - 1] === 0) {
+                break;
+            }
+        }
+
         return (
             <>
                 <div className="card">
@@ -59,7 +64,11 @@ export default function GradePlanner(props) {
                             an estimate of your participation credits. Or click the button to set
                             them all to the maximum!
                         </p>
-                        <button className="btn btn-primary" type="button" onClick={props.onSetParticipationToMax}>
+                        <button
+                            className="btn btn-primary"
+                            type="button"
+                            onClick={props.onSetParticipationToMax}
+                        >
                             Set all unknown participation credits to maximum
                         </button>
                     </div>
@@ -69,8 +78,21 @@ export default function GradePlanner(props) {
         );
     } else {
         const recoveredMidtermPoints = examRecovery(Midterm, participation, 60, 20);
-        for (let rawFinalScore = 0; rawFinalScore <= 80; ++rawFinalScore) {
-
+        const thresholdLookup = {};
+        for (let rawFinalScore = 300; rawFinalScore >= 0; --rawFinalScore) {
+            const recoveredFinalPoints = examRecovery(rawFinalScore, participation, 80, 20);
+            const grade = getGrade(
+                totalNonFinal + recoveredMidtermPoints + rawFinalScore + recoveredFinalPoints,
+                BINS,
+                GRADES,
+            );
+            thresholdLookup[grade] = rawFinalScore;
+        }
+        const needed = [];
+        for (const grade of GRADES) {
+            if (thresholdLookup[grade] !== undefined) {
+                needed.push(thresholdLookup[grade]);
+            }
         }
         return (
             <>
@@ -90,5 +112,17 @@ export default function GradePlanner(props) {
 }
 
 function examRecovery(examScore, participation, maxExamScore, recoveryCap) {
+    const halfScore = maxExamScore / 2;
+    const maxRecovery = Math.max(0, (halfScore - examScore) / 2);
+    const recoveryRatio = Math.min(participation, recoveryCap) / recoveryCap;
+    return maxRecovery * recoveryRatio;
+}
 
+function getGrade(score, bins, grades) {
+    for (let i = 0; i !== bins.length; ++i) {
+        if (score >= bins[i]) {
+            return grades[i];
+        }
+    }
+    return "F";
 }

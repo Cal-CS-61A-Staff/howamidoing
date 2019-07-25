@@ -16,7 +16,7 @@ from server.secrets import SECRET
 CONSUMER_KEY = "61a-grade-view"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-GRADES_PATH = os.path.join(BASE_DIR, "../cached/grades.csv")
+GRADES_PATH = os.path.join(BASE_DIR, "grades.csv")
 
 
 def create_client(app):
@@ -58,7 +58,7 @@ def create_client(app):
             if 'dev_token' in session:
                 ret = remote.get('user', token=session['dev_token'])
                 email = ret.data['data']['email']
-                email = "chris.landgrebe31@berkeley.edu"
+                email = "some.random@berkeley.edu"
                 with open(GRADES_PATH) as grades:
                     reader = csv.reader(grades)
                     header = next(reader)

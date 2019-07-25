@@ -28,7 +28,7 @@ export default class Topic extends Component {
                         name={elem.name}
                         score={this.props.data[elem.name]}
                         plannedScore={this.props.planned[elem.name]}
-                        readOnly={readOnly}
+                        placeholder={this.props.plannedTotals[elem.name]}
                         maxScore={elem.maxScore}
                         future={elem.future}
                         key={rows.length}
@@ -43,6 +43,7 @@ export default class Topic extends Component {
                         schema={elem}
                         data={this.props.data}
                         planned={this.props.planned}
+                        plannedTotals={this.props.plannedTotals}
                         readOnly={readOnly}
                         key={rows.length}
                         indent={this.props.indent + 1}
@@ -63,6 +64,7 @@ export default class Topic extends Component {
                     name={this.props.schema.name}
                     score={this.props.data[this.props.schema.name]}
                     plannedScore={this.props.planned[this.props.schema.name]}
+                    placeholder={this.props.plannedTotals[this.props.schema.name]}
                     readOnly={this.props.readOnly}
                     maxScore={displayedMaxScore}
                     onClick={this.toggleCollapse}

@@ -8,6 +8,7 @@ export default function GradeTable(props) {
             schema={elem}
             data={props.data}
             planned={props.planned}
+            plannedTotals={props.plannedTotals}
             indent={0}
             key={index}
             future={props.future}

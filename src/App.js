@@ -41,9 +41,12 @@ function Topic(name, children, cappedScore) {
     };
 }
 
-function Assignment(name, maxScore) {
+function Assignment(name, maxScore, weighting) {
+    if (!weighting) {
+        weighting = 1;
+    }
     return {
-        isTopic: false, name, maxScore, futureMaxScore: maxScore,
+        isTopic: false, name, maxScore, futureMaxScore: maxScore, weighting,
     };
 }
 
@@ -54,10 +57,10 @@ function Future(elem) {
 
 const ASSIGNMENTS = [
     Topic("Raw Score", [
-        Future(Topic("Exams", [
+        Topic("Exams", [
             Assignment("Midterm", 60),
-            Assignment("Final", 80),
-        ])),
+            Future(Assignment("Final", 80)),
+        ]),
         Topic("Homework",
             [
                 Assignment("Homework 0 (Total)", 2),
@@ -66,18 +69,31 @@ const ASSIGNMENTS = [
         Topic("Projects", [
             Topic("Hog", [
                 Assignment("Hog (Total)", 22),
+                Assignment("Hog (Composition)", 2),
                 Assignment("Hog Checkpoint (Total)", 1),
             ]),
             Future(Topic("Typing Test", [
-                Assignment("Typing Test (Total)", 22),
-                Assignment("Typing Test Checkpoint (Total)", 1),
+                Assignment("Typing Test (Total)", 16),
+                Assignment("Typing Test Checkpoint 1 (Total)", 1),
+                Assignment("Typing Test Checkpoint 2 (Total)", 1),
+                Assignment("Typing Test (Composition)", 2),
+                Assignment("Typing Test (Extra Credit)", 1),
             ])),
-            Future(Assignment("Ants", 32)),
-            Future(Assignment("Scheme", 32)),
+            Future(Topic("Ants", [
+                Assignment("Ants (Total)", 27),
+                Assignment("Ants Checkpoint (Total)", 1),
+                Assignment("Ants (Composition)", 2),
+            ])),
+            Future(Topic("Scheme", [
+                Assignment("Scheme (Total)", 31),
+                Assignment("Scheme Checkpoint 1 (Total)", 1),
+                Assignment("Scheme Checkpoint 2 (Total)", 1),
+                Assignment("Scheme (Composition)", 2),
+            ])),
         ]),
         Topic("Lab", [
-            ...range(4).map(i => Assignment(`Lab ${i} (Total)`, 1)),
-            ...range(4, 20).map(i => Future(Assignment(`Lab ${i} (Total)`, 1))),
+            ...range(4).map(i => Assignment(`Lab ${i} (Total)`, 2, 2)),
+            ...range(4, 10).map(i => Future(Assignment(`Lab ${i} (Total)`, 2, 2))),
         ]),
     ]),
     Topic("Participation Credits", [
@@ -86,7 +102,7 @@ const ASSIGNMENTS = [
             ...range(2, 14).map(i => Future(Assignment(`Discussion ${i} (Total)`, 1))),
         ]),
         Topic("Lab Attendance", [
-            ...range(14).map(i => Future(Assignment(`Discussion ${i} (Total)`, 1))),
+            ...range(14).map(i => Future(Assignment(`Lab Attendance ${i} (Total)`, 1))),
         ]),
     ], 20),
 ];
@@ -122,7 +138,7 @@ class App extends Component {
         this.state = {
             scores: [],
             plannedScores: [],
-            future: true,
+            future: false,
         };
     }
 
@@ -131,8 +147,12 @@ class App extends Component {
         const scores = {};
         if (success) {
             for (let i = 0; i !== header.length; ++i) {
-                scores[header[i]] = data[i];
+                if (LOOKUP[header[i]]) {
+                    scores[header[i]] = data[i] * LOOKUP[header[i]].weighting;
+                }
             }
+        } else {
+            window.location.replace("./login");
         }
         this.setState({ scores, plannedScores: extend(scores) });
     }
@@ -236,7 +256,8 @@ class App extends Component {
                         <GradeTable
                             schema={ASSIGNMENTS}
                             data={totals}
-                            planned={plannedTotals}
+                            planned={this.state.plannedScores}
+                            plannedTotals={plannedTotals}
                             future={this.state.future}
                             onFutureScoreChange={this.handleFutureScoreChange}
                         />

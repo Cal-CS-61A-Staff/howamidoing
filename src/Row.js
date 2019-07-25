@@ -55,6 +55,7 @@ export default class Row extends Component {
             ? (
                 <ScoreEntry
                     value={this.props.plannedScore}
+                    placeholder={this.props.placeholder}
                     readOnly={this.props.readOnly}
                     onChange={e => this.props.onChange(this.props.name, e.target.value)}
                 />
