@@ -2,12 +2,16 @@
 import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
+
 import "./App.css";
 import $ from "jquery";
+
 import GradeTable from "./GradeTable.js";
 import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
-import { ASSIGNMENTS } from "./config/ee16a.js";
+import { COURSE_CODE, createAssignments } from "./config/ee16a.js";
+
+const ASSIGNMENTS = createAssignments();
 
 const LOOKUP = {};
 
@@ -51,7 +55,11 @@ class App extends Component {
             for (let i = 0; i !== header.length; ++i) {
                 if (LOOKUP[header[i]]) {
                     scores[header[i]] = data[i] * LOOKUP[header[i]].weighting;
+                    LOOKUP[header[i]].future = false;
                 }
+            }
+            for (const assignment of ASSIGNMENTS) {
+                this.recursivelySetFuture(assignment);
             }
         } else {
             window.location.replace("./login");
@@ -69,14 +77,23 @@ class App extends Component {
     };
 
     recursivelyMaximize = (topic, plannedScores) => {
-        if (!topic.isTopic) {
-            if (topic.name !== "Final" && Number.isNaN(plannedScores[topic.name])) {
-                plannedScores[topic.name] = topic.maxScore;
-            }
-        } else {
+        if (topic.isTopic) {
             for (const child of topic.children) {
                 this.recursivelyMaximize(child, plannedScores);
             }
+        } else if (topic.name !== "Final" && Number.isNaN(plannedScores[topic.name])) {
+            plannedScores[topic.name] = topic.maxScore;
+        }
+    };
+
+    recursivelySetFuture = (topic) => {
+        if (topic.isTopic) {
+            let future = true;
+            for (const child of topic.children) {
+                this.recursivelySetFuture(child);
+                future = future && child.future;
+            }
+            topic.future = future;
         }
     };
 
@@ -147,7 +164,7 @@ class App extends Component {
                     <div className="col">
                         <br />
                         <h1 className="display-4">
-                            <strong>16A</strong>
+                            <strong>{COURSE_CODE}</strong>
                             {" "}
                             Status Check
                         </h1>
@@ -155,7 +172,8 @@ class App extends Component {
                             onChange={this.handleFutureCheckboxChange}
                             checked={this.state.future}
                         />
-                        {/* <LoginButton /> */}
+                        {/* eslint-disable-next-line spaced-comment */}
+                        {/*<LoginButton />*/}
                         <br />
                         {this.state.future && (
                             <GradePlanner

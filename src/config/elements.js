@@ -37,7 +37,12 @@ export function Topic(name, children, cappedScore, customCalculator) {
         futureMaxScore = Math.min(cappedScore, maxFutureChildScores.reduce((a, b) => a + b, 0));
     }
     return {
-        isTopic: true, name, children, maxScore, futureMaxScore, customCalculator,
+        isTopic: true,
+        name,
+        children,
+        maxScore,
+        futureMaxScore,
+        customCalculator,
     };
 }
 
@@ -46,11 +51,16 @@ export function Assignment(name, maxScore, weighting) {
         weighting = 1;
     }
     return {
-        isTopic: false, name, maxScore, futureMaxScore: maxScore, weighting,
+        isTopic: false,
+        name,
+        maxScore,
+        futureMaxScore: maxScore,
+        weighting,
+        future: true,
     };
 }
 
-export function Future(elem) {
-    elem.future = true;
+export function Always(elem) {
+    elem.future = false;
     return elem;
 }
