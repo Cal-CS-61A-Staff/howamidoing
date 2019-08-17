@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import $ from "jquery";
 import "./Row.css";
 import ScoreEntry from "./ScoreEntry.js";
 

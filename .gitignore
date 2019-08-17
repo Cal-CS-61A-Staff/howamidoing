@@ -23,4 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 
 /cached/grades.csv
+/deploy/grades.csv
 /server/secrets.py

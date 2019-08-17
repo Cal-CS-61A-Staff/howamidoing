@@ -11,7 +11,7 @@ from flask import Flask, redirect, url_for, session, request, jsonify, abort, se
 from flask_oauthlib.client import OAuth
 import requests
 
-from server.secrets import SECRET
+from secrets import SECRET
 
 CONSUMER_KEY = "61a-grade-view"
 

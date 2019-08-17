@@ -7,105 +7,7 @@ import $ from "jquery";
 import GradeTable from "./GradeTable.js";
 import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
-
-function range(a, b) {
-    if (!b) {
-        b = a;
-        a = 0;
-    }
-    const out = [];
-    for (let i = a; i !== b; ++i) {
-        out.push(i);
-    }
-    return out;
-}
-
-function Topic(name, children, cappedScore) {
-    if (!cappedScore) {
-        cappedScore = 1000000000;
-    }
-    let maxScore = 0;
-    for (const child of children) {
-        if (!child.future) {
-            maxScore += child.maxScore;
-        }
-    }
-    let futureMaxScore = 0;
-    for (const child of children) {
-        futureMaxScore += child.futureMaxScore;
-    }
-    maxScore = Math.min(cappedScore, maxScore);
-    futureMaxScore = Math.min(cappedScore, futureMaxScore);
-    return {
-        isTopic: true, name, children, maxScore, futureMaxScore,
-    };
-}
-
-function Assignment(name, maxScore, weighting) {
-    if (!weighting) {
-        weighting = 1;
-    }
-    return {
-        isTopic: false, name, maxScore, futureMaxScore: maxScore, weighting,
-    };
-}
-
-function Future(elem) {
-    elem.future = true;
-    return elem;
-}
-
-const ASSIGNMENTS = [
-    Topic("Raw Score", [
-        Topic("Exams", [
-            Assignment("Midterm", 60),
-            Future(Assignment("Final", 80)),
-        ]),
-        Topic("Homework",
-            [
-                Assignment("Homework 0 (Total)", 2),
-                ...range(1, 2).map(i => Assignment(`Homework ${i} (Total)`, 4)),
-                ...range(2, 8).map(i => Future(Assignment(`Homework ${i} (Total)`, 4)))]),
-        Topic("Projects", [
-            Topic("Hog", [
-                Assignment("Hog (Total)", 22),
-                Assignment("Hog (Composition)", 2),
-                Assignment("Hog Checkpoint (Total)", 1),
-            ]),
-            Future(Topic("Typing Test", [
-                Assignment("Typing Test (Total)", 16),
-                Assignment("Typing Test Checkpoint 1 (Total)", 1),
-                Assignment("Typing Test Checkpoint 2 (Total)", 1),
-                Assignment("Typing Test (Composition)", 2),
-                Assignment("Typing Test (Extra Credit)", 1),
-            ])),
-            Future(Topic("Ants", [
-                Assignment("Ants (Total)", 27),
-                Assignment("Ants Checkpoint (Total)", 1),
-                Assignment("Ants (Composition)", 2),
-            ])),
-            Future(Topic("Scheme", [
-                Assignment("Scheme (Total)", 31),
-                Assignment("Scheme Checkpoint 1 (Total)", 1),
-                Assignment("Scheme Checkpoint 2 (Total)", 1),
-                Assignment("Scheme (Composition)", 2),
-            ])),
-        ]),
-        Topic("Lab", [
-            ...range(4).map(i => Assignment(`Lab ${i} (Total)`, 2, 2)),
-            ...range(4, 10).map(i => Future(Assignment(`Lab ${i} (Total)`, 2, 2))),
-        ]),
-    ]),
-    Topic("Participation Credits", [
-        Topic("Discussion Attendance", [
-            ...range(2).map(i => Assignment(`Discussion ${i} (Total)`, 1)),
-            ...range(2, 14).map(i => Future(Assignment(`Discussion ${i} (Total)`, 1))),
-        ]),
-        Topic("Lab Attendance", [
-            ...range(14).map(i => Future(Assignment(`Lab Attendance ${i} (Total)`, 1))),
-        ]),
-    ], 20),
-];
+import { ASSIGNMENTS } from "./config/ee16a.js";
 
 const LOOKUP = {};
 
@@ -143,7 +45,7 @@ class App extends Component {
     }
 
     async componentDidMount() {
-        const { success, header, data } = await $.get("./query");
+        const { success, header, data } = await $.get("./query/");
         const scores = {};
         if (success) {
             for (let i = 0; i !== header.length; ++i) {
@@ -168,7 +70,7 @@ class App extends Component {
 
     recursivelyMaximize = (topic, plannedScores) => {
         if (!topic.isTopic) {
-            if (Number.isNaN(plannedScores[topic.name])) {
+            if (topic.name !== "Final" && Number.isNaN(plannedScores[topic.name])) {
                 plannedScores[topic.name] = topic.maxScore;
             }
         } else {
@@ -179,9 +81,9 @@ class App extends Component {
     };
 
     handleSetCourseworkToMax = () => {
-        this.recursivelyMaximize(LOOKUP["Homework"], this.state.plannedScores);
-        this.recursivelyMaximize(LOOKUP["Projects"], this.state.plannedScores);
-        this.recursivelyMaximize(LOOKUP["Lab"], this.state.plannedScores);
+        for (const assignment of ASSIGNMENTS) {
+            this.recursivelyMaximize(assignment, this.state.plannedScores);
+        }
         this.forceUpdate();
     };
 
@@ -199,9 +101,18 @@ class App extends Component {
                 ? Number.parseFloat(scores[curr.name]) : NaN;
             return totals[curr.name];
         }
+
+        const childTotals = [];
+
         let out = 0;
         for (const child of curr.children) {
-            out += this.computeTotals(child, scores, totals);
+            const childTotal = this.computeTotals(child, scores, totals);
+            out += childTotal;
+            childTotals.push(childTotal);
+        }
+
+        if (curr.customCalculator) {
+            out = curr.customCalculator(childTotals);
         }
 
         const limit = this.state.future ? curr.futureMaxScore : curr.maxScore;
@@ -236,7 +147,7 @@ class App extends Component {
                     <div className="col">
                         <br />
                         <h1 className="display-4">
-                            <strong>61A</strong>
+                            <strong>16A</strong>
                             {" "}
                             Status Check
                         </h1>

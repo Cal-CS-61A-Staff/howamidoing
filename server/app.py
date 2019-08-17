@@ -52,13 +52,13 @@ def create_client(app):
     def index():
         return send_from_directory("static", "index.html")
 
-    @app.route('/query')
+    @app.route('/query/')
     def query():
         try:
             if 'dev_token' in session:
                 ret = remote.get('user', token=session['dev_token'])
                 email = ret.data['data']['email']
-                email = "chris.landgrebe31@berkeley.edu"
+                email = "some.random@berkeley.edu"
                 with open(GRADES_PATH) as grades:
                     reader = csv.reader(grades)
                     header = next(reader)
@@ -79,17 +79,17 @@ def create_client(app):
             "success": False,
         })
 
-    @app.route('/login')
+    @app.route('/login/')
     def login():
         print(url_for('authorized', _external=True))
         return remote.authorize(callback=url_for('authorized', _external=True))
 
-    @app.route('/logout')
+    @app.route('/logout/')
     def logout():
         session.pop('dev_token', None)
         return redirect(url_for('query'))
 
-    @app.route('/authorized')
+    @app.route('/authorized/')
     def authorized():
         resp = remote.authorized_response()
         if resp is None:
@@ -100,7 +100,7 @@ def create_client(app):
             session['dev_token'] = (resp['access_token'], '')
         return redirect("/")
 
-    @app.route('/user')
+    @app.route('/user/')
     def client_method():
         token = session['dev_token'][0]
         r = requests.get('http://localhost:5000/api/v3/user/?access_token={}'.format(token))
