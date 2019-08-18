@@ -27,7 +27,7 @@ function discCalculator(discScores) {
     if (Number.isNaN(rawTotalDiscScore)) {
         return NaN;
     } else {
-        return Math.min(rawTotalDiscScore / 2, 6);
+        return Math.min(rawTotalDiscScore, 6);
     }
 }
 
@@ -37,18 +37,11 @@ function hwCalculator(hwScores) {
     if (Number.isNaN(totalRawScore)) {
         return NaN;
     } else if (totalRawScore >= 8) {
-        return 2;
+        return 10;
     } else {
-        return totalRawScore / 5;
+        return totalRawScore;
     }
 }
-
-const makeHomeworkAssignment = i => Topic(`Final Homework ${i} Score`, [
-    Assignment(`Raw Self-Grade (HW ${i})`, 10),
-    Assignment(`Reader Adjusted Self-Grade (HW ${i})`, 10),
-    Assignment(`Resubmitted? (0 / 1) (HW ${i})`, 1),
-    Assignment(`Resubmission Point Gain (HW ${i})`, 10),
-], 2, hwCalculator);
 
 export function createAssignments() {
     return [
@@ -59,14 +52,24 @@ export function createAssignments() {
                 Assignment("Final", 68),
             ]),
             Topic("Homework", [
-                ...range(13).map(i => makeHomeworkAssignment(i)),
-            ]),
+                ...range(14).map(i => Topic(`Final Homework ${i} Score`, [
+                    Assignment(`Raw Self-Grade (HW ${i})`, 10),
+                    Assignment(`Reader Adjusted Self-Grade (HW ${i})`, 10),
+                    Assignment(`Resubmitted? (HW ${i})`, 1, 1, true),
+                    Assignment(`Resubmission Point Gain (HW ${i})`, 10),
+                ], 10, hwCalculator, true)),
+            ], 26, lst => lst.reduce((a, b) => a + b, 0) / 5),
             Topic("Labs", [
-                ...range(9).map(i => Always(Assignment(`Lab ${i} (lab title?)`, 1))),
+                ...["Imaging 1", "Imaging 2", "Imaging 3", "Touch 1", "Touch 2", "Touch 3A", "Touch 3B", "APS 1", "APS 2"].map(
+                    (title, i) => Always(Assignment(`${title} (Lab ${i+1})`, 1))
+                ),
             ], 32, labCalculator),
             Topic("Discussion APE", [
-                ...range(2).map(i => Assignment(`Discussion ${i} (date?)`, 1)),
-                ...range(2, 22).map(i => Assignment(`Discussion ${i} (date?)`, 1)),
+                ...range(1, 16).flatMap(
+                    i => ["A", "B"].map(
+                        letter => Assignment(`Discussion ${i}${letter} (date?)`, 0.5),
+                    ),
+                ),
             ], 6, discCalculator),
         ]),
     ];

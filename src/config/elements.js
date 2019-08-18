@@ -1,3 +1,11 @@
+let header;
+let scores;
+
+export function setSchema(_header, _scores) {
+    header = _header;
+    scores = _scores;
+}
+
 /* eslint-disable no-param-reassign,dot-notation */
 export function range(a, b) {
     if (!b) {
@@ -11,13 +19,12 @@ export function range(a, b) {
     return out;
 }
 
-export function Topic(name, children, cappedScore, customCalculator) {
-    if (!cappedScore) {
-        cappedScore = 1000000000;
-    }
+export function Topic(name, children, cappedScore = 1000000000, customCalculator, lockedChildren = false) {
+    let future = true;
     const maxChildScores = [];
     for (const child of children) {
         if (!child.future) {
+            future = false;
             maxChildScores.push(child.maxScore);
         }
     }
@@ -43,20 +50,20 @@ export function Topic(name, children, cappedScore, customCalculator) {
         maxScore,
         futureMaxScore,
         customCalculator,
+        future,
+        lockedChildren,
     };
 }
 
-export function Assignment(name, maxScore, weighting) {
-    if (!weighting) {
-        weighting = 1;
-    }
+export function Assignment(name, maxScore, weighting = 1, booleanValued = false) {
     return {
         isTopic: false,
         name,
         maxScore,
         futureMaxScore: maxScore,
         weighting,
-        future: true,
+        future: !header.includes(name),
+        booleanValued,
     };
 }
 

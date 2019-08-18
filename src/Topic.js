@@ -22,14 +22,16 @@ export default class Topic extends Component {
             if (!this.props.future && elem.future) {
                 continue;
             }
-            if (!elem.isTopic) {
+            if (!elem.isTopic || (elem.future && elem.lockedChildren)) {
                 rows.push(
                     <Row
                         name={elem.name}
                         score={this.props.data[elem.name]}
                         plannedScore={this.props.planned[elem.name]}
                         placeholder={this.props.plannedTotals[elem.name]}
-                        maxScore={elem.maxScore}
+                        booleanValued={elem.booleanValued}
+                        readOnly={!Number.isNaN(this.props.data[elem.name])}
+                        maxScore={elem.isTopic ? elem.futureMaxScore : elem.maxScore}
                         future={elem.future}
                         key={rows.length}
                         indent={this.props.indent + 1}

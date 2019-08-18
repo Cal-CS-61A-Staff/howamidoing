@@ -10,13 +10,19 @@ import GradeTable from "./GradeTable.js";
 import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
 import { COURSE_CODE, createAssignments } from "./config/ee16a.js";
+import { setSchema } from "./config/elements.js";
 
-const ASSIGNMENTS = createAssignments();
+let ASSIGNMENTS = [];
 
-const LOOKUP = {};
+let LOOKUP = {};
 
-for (const assignment of ASSIGNMENTS) {
-    initializeLookup(assignment);
+function initialize(header, scores) {
+    setSchema(header, scores);
+    ASSIGNMENTS = createAssignments();
+    LOOKUP = {};
+    for (const assignment of ASSIGNMENTS) {
+        initializeLookup(assignment);
+    }
 }
 
 function initializeLookup(assignment) {
@@ -52,14 +58,12 @@ class App extends Component {
         const { success, header, data } = await $.get("./query/");
         const scores = {};
         if (success) {
+            initialize(header, data);
+
             for (let i = 0; i !== header.length; ++i) {
                 if (LOOKUP[header[i]]) {
                     scores[header[i]] = data[i] * LOOKUP[header[i]].weighting;
-                    LOOKUP[header[i]].future = false;
                 }
-            }
-            for (const assignment of ASSIGNMENTS) {
-                this.recursivelySetFuture(assignment);
             }
         } else {
             window.location.replace("./login");
@@ -83,17 +87,6 @@ class App extends Component {
             }
         } else if (topic.name !== "Final" && Number.isNaN(plannedScores[topic.name])) {
             plannedScores[topic.name] = topic.maxScore;
-        }
-    };
-
-    recursivelySetFuture = (topic) => {
-        if (topic.isTopic) {
-            let future = true;
-            for (const child of topic.children) {
-                this.recursivelySetFuture(child);
-                future = future && child.future;
-            }
-            topic.future = future;
         }
     };
 
