@@ -52,16 +52,22 @@ export function createAssignments() {
                 Assignment("Final", 68),
             ]),
             Topic("Homework", [
-                ...range(14).map(i => Topic(`Final Homework ${i} Score`, [
-                    Assignment(`Raw Self-Grade (HW ${i})`, 10),
-                    Assignment(`Reader Adjusted Self-Grade (HW ${i})`, 10),
-                    Assignment(`Resubmitted? (HW ${i})`, 1, 1, true),
-                    Assignment(`Resubmission Point Gain (HW ${i})`, 10),
-                ], 10, hwCalculator, true)),
+                Topic("Raw Homework Scores", [
+                    ...range(14).map(i => Topic(`Final Homework ${i} Score`, [
+                        Assignment(`Raw Self-Grade (HW ${i})`, 10),
+                        Assignment(`Reader Adjusted Self-Grade (HW ${i})`, 10),
+                        Assignment(`Resubmitted? (HW ${i})`, 1, 1, true),
+                        Assignment(`Resubmission Point Gain (HW ${i})`, 10),
+                    ], 10, hwCalculator, true)),
+                ]),
+                Topic("Reader Adjustment Factor", [
+                    Assignment("Raw self-grades for selected problems"),
+                    Assignment("Adjusted self-grades for selected problems"),
+                ]),
             ], 26, lst => lst.reduce((a, b) => a + b, 0) / 5),
             Topic("Labs", [
                 ...["Imaging 1", "Imaging 2", "Imaging 3", "Touch 1", "Touch 2", "Touch 3A", "Touch 3B", "APS 1", "APS 2"].map(
-                    (title, i) => Always(Assignment(`${title} (Lab ${i+1})`, 1))
+                    (title, i) => Always(Assignment(`${title} (Lab ${i + 1})`, 1)),
                 ),
             ], 32, labCalculator),
             Topic("Discussion APE", [

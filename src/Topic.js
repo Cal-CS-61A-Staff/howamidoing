@@ -33,7 +33,7 @@ export default class Topic extends Component {
                         readOnly={!Number.isNaN(this.props.data[elem.name])}
                         maxScore={elem.isTopic ? elem.futureMaxScore : elem.maxScore}
                         future={elem.future}
-                        key={rows.length}
+                        key={elem.name}
                         indent={this.props.indent + 1}
                         collapsed={this.props.collapsed || this.state.collapsed}
                         onChange={this.props.onFutureScoreChange}
@@ -47,7 +47,7 @@ export default class Topic extends Component {
                         planned={this.props.planned}
                         plannedTotals={this.props.plannedTotals}
                         readOnly={readOnly}
-                        key={rows.length}
+                        key={elem.name}
                         indent={this.props.indent + 1}
                         collapsed={this.props.collapsed || this.state.collapsed}
                         future={this.props.future}
