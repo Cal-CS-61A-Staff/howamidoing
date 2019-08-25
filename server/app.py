@@ -11,7 +11,7 @@ from flask import Flask, redirect, url_for, session, request, jsonify, abort, se
 from flask_oauthlib.client import OAuth
 import requests
 
-from server.secrets import SECRET
+from .secrets import SECRET
 
 CONSUMER_KEY = "61a-grade-view"
 
@@ -114,8 +114,10 @@ def create_client(app):
     return remote
 
 
+app = Flask(__name__, static_url_path="", static_folder="static")
+app.secret_key = SECRET
+create_client(app)
+
+
 if __name__ == '__main__':
-    app = Flask(__name__, static_url_path="", static_folder="static")
-    app.secret_key = SECRET
-    create_client(app)
     app.run(host='127.0.0.1', port=8000)
