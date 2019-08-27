@@ -89,7 +89,7 @@ export function computeNeededFinalScore(scores) {
 
     for (const [bin, i] of BINS.map((val, index) => [val, index])) {
         const neededScore = Math.max(0, bin - totalNonFinal);
-        if (neededScore <= 68) {
+        if (neededScore <= 100) {
             needed.push(neededScore);
             grades.push(GRADES[i]);
         }
