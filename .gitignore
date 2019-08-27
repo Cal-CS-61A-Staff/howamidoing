@@ -10,6 +10,7 @@
 
 # production
 /build
+/deploy
 
 # misc
 .DS_Store
@@ -22,6 +23,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-/cached/grades.csv
-/deploy/grades.csv
-/server/secrets.py
+grades.csv
+secrets.py
