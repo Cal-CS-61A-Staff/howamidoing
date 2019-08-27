@@ -23,8 +23,8 @@ function labCalculator(labScores) {
 }
 
 function hwCalculator(hwScores) {
-    const [, readerAdjustedGrade, , resubmissionBonus] = hwScores;
-    const totalRawScore = readerAdjustedGrade + resubmissionBonus;
+    const [rawScore, , resubmissionBonus] = hwScores;
+    const totalRawScore = rawScore + resubmissionBonus;
     if (Number.isNaN(totalRawScore)) {
         return NaN;
     } else if (totalRawScore >= 8) {
@@ -44,9 +44,8 @@ export function createAssignments() {
             ]),
             Topic("Homework", [
                 Topic("Raw Homework Scores", [
-                    ...range(14).map(i => Topic(`Final Homework ${i} Score`, [
+                    ...range(15).map(i => Topic(`Final Homework ${i} Score`, [
                         Assignment(`Raw Self-Grade (HW ${i})`, 10),
-                        Assignment(`Reader Adjusted Self-Grade (HW ${i})`, 10),
                         Assignment(`Resubmitted? (HW ${i})`, 1, 1, true),
                         Assignment(`Resubmission Point Gain (HW ${i})`, 10),
                     ], 10, hwCalculator, true)),
@@ -62,9 +61,9 @@ export function createAssignments() {
                 ),
             ], 45, labCalculator),
             Topic("Participation", [
-                ...range(1, 16).flatMap(
-                    i => ["A", "B"].map(
-                        letter => Assignment(`Discussion ${i}${letter} (date?)`, 1.25),
+                ...range(16).flatMap(
+                    i => [...(i === 0 ? [] : ["A"]), "B"].map(
+                        letter => Assignment(`Discussion ${i}${letter}`, 1.25),
                     ),
                 ),
             ], 20),
