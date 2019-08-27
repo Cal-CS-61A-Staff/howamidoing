@@ -11,6 +11,7 @@ import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
 import { COURSE_CODE, createAssignments } from "./config/ee16a.js";
 import { setSchema } from "./config/elements.js";
+import LoginButton from "./LoginButton.js";
 
 let ASSIGNMENTS = [];
 
@@ -51,13 +52,18 @@ class App extends Component {
             scores: [],
             plannedScores: [],
             future: false,
+            success: false,
         };
     }
 
     async componentDidMount() {
-        const { success, header, data } = await $.get("./query/");
+        const {
+            success, retry, header, data,
+        } = await $.get("./query/");
         const scores = {};
         if (success) {
+            this.setState({ success: true });
+
             initialize(header, data);
 
             for (let i = 0; i !== header.length; ++i) {
@@ -65,8 +71,8 @@ class App extends Component {
                     scores[header[i]] = data[i] * LOOKUP[header[i]].weighting;
                 }
             }
-        } else {
-            window.location.replace("./login");
+        } else if (retry) {
+            this.refresh();
         }
         this.setState({ scores, plannedScores: extend(scores) });
     }
@@ -88,6 +94,11 @@ class App extends Component {
         } else if (topic.name !== "Final" && Number.isNaN(plannedScores[topic.name])) {
             plannedScores[topic.name] = topic.maxScore;
         }
+    };
+
+    refresh = () => {
+        console.log("refresh!");
+        window.location.replace("./login");
     };
 
     handleSetCourseworkToMax = () => {
@@ -151,6 +162,33 @@ class App extends Component {
             this.computeTotals(assignment, this.state.plannedScores, plannedTotals);
         }
 
+        const contents = this.state.success
+            ? (
+                <>
+                    <FutureCheckBox
+                        onChange={this.handleFutureCheckboxChange}
+                        checked={this.state.future}
+                    />
+                    <br />
+                    {this.state.future && (
+                        <GradePlanner
+                            data={plannedTotals}
+                            onSetCourseworkToMax={this.handleSetCourseworkToMax}
+                            onSetParticipationToMax={this.handleSetParticipationToMax}
+                        />
+                    )}
+                    <GradeTable
+                        schema={ASSIGNMENTS}
+                        data={totals}
+                        planned={this.state.plannedScores}
+                        plannedTotals={plannedTotals}
+                        future={this.state.future}
+                        onFutureScoreChange={this.handleFutureScoreChange}
+                    />
+                </>
+            )
+            : <LoginButton onClick={this.refresh} />;
+
         return (
             <div className="App container">
                 <div className="row">
@@ -161,28 +199,7 @@ class App extends Component {
                             {" "}
                             Status Check
                         </h1>
-                        <FutureCheckBox
-                            onChange={this.handleFutureCheckboxChange}
-                            checked={this.state.future}
-                        />
-                        {/* eslint-disable-next-line spaced-comment */}
-                        {/*<LoginButton />*/}
-                        <br />
-                        {this.state.future && (
-                            <GradePlanner
-                                data={plannedTotals}
-                                onSetCourseworkToMax={this.handleSetCourseworkToMax}
-                                onSetParticipationToMax={this.handleSetParticipationToMax}
-                            />
-                        )}
-                        <GradeTable
-                            schema={ASSIGNMENTS}
-                            data={totals}
-                            planned={this.state.plannedScores}
-                            plannedTotals={plannedTotals}
-                            future={this.state.future}
-                            onFutureScoreChange={this.handleFutureScoreChange}
-                        />
+                        {contents}
                     </div>
                 </div>
             </div>

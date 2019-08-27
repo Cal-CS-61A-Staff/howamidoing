@@ -10,6 +10,14 @@
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
+      <webServer id="cff5b87a-7957-4e71-8232-d6b8f83c427c" name="LIVE" url="http://ashby.cs.berkeley.edu">
+        <fileTransfer host="ashby.cs.berkeley.edu" port="22" privateKey="$USER_HOME$/.ssh/id_rsa" rootFolder="/home/ff/ee16a/" accessType="SFTP" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

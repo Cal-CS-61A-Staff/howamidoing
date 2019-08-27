@@ -19,7 +19,7 @@ export function range(a, b) {
     return out;
 }
 
-export function Topic(name, children, cappedScore = 1000000000, customCalculator, lockedChildren = false) {
+export function Topic(name, children, cappedScore = Infinity, customCalculator, lockedChildren = false) {
     let future = true;
     const maxChildScores = [];
     for (const child of children) {

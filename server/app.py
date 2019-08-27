@@ -11,12 +11,12 @@ from flask import Flask, redirect, url_for, session, request, jsonify, abort, se
 from flask_oauthlib.client import OAuth
 import requests
 
-from server.secrets import SECRET
+from .secrets import SECRET
 
 CONSUMER_KEY = "61a-grade-view"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-GRADES_PATH = os.path.join(BASE_DIR, "../cached/grades.csv")
+GRADES_PATH = os.path.join(BASE_DIR, "./grades.csv")
 
 
 def create_client(app):
@@ -58,7 +58,7 @@ def create_client(app):
             if 'dev_token' in session:
                 ret = remote.get('user', token=session['dev_token'])
                 email = ret.data['data']['email']
-                email = "some.random@berkeley.edu"
+                # email = "some.random@berkeley.edu"
                 with open(GRADES_PATH) as grades:
                     reader = csv.reader(grades)
                     header = next(reader)
@@ -70,18 +70,22 @@ def create_client(app):
                                 "data": row,
                             })
             else:
-                print("fail")
+                return jsonify({
+                    "success": False,
+                    "retry": True,
+                })
 
         except Exception as e:
             print(e)
             pass
         return jsonify({
             "success": False,
+            "retry": False,
         })
 
     @app.route('/login/')
     def login():
-        print(url_for('authorized', _external=True))
+        session.pop('dev_token', None)
         return remote.authorize(callback=url_for('authorized', _external=True))
 
     @app.route('/logout/')
@@ -114,8 +118,9 @@ def create_client(app):
     return remote
 
 
+app = Flask(__name__, static_url_path="", static_folder="static")
+app.secret_key = SECRET
+create_client(app)
+
 if __name__ == '__main__':
-    app = Flask(__name__, static_url_path="", static_folder="static")
-    app.secret_key = SECRET
-    create_client(app)
     app.run(host='127.0.0.1', port=8000)
