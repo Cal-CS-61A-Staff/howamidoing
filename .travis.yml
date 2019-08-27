@@ -1,8 +1,13 @@
 language: node_js
 
+os: osx
+
 node_js:
   - node
 
+script:
+- echo "skipping tests"
+
 deploy:
   provider: script
-  script: yarn deploy
+  script: yarn build && yarn run shipit deploy
