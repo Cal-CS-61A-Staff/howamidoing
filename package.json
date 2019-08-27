@@ -12,7 +12,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build && rm -rf deploy && mkdir deploy && cp -a server/. deploy/ && mv build deploy/static",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "shipit deploy"
   },
   "browserslist": {
     "production": [
@@ -30,6 +31,8 @@
     "bootstrap": "^4.3.1",
     "eslint-config-airbnb": "^17.1.1",
     "jquery": "^3.4.1",
-    "popper.js": "^1.15.0"
+    "popper.js": "^1.15.0",
+    "shipit-cli": "^5.0.0",
+    "shipit-deploy": "^5.0.0"
   }
 }
