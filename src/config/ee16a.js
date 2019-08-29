@@ -63,7 +63,7 @@ export function createAssignments() {
             Topic("Participation", [
                 ...range(16).flatMap(
                     i => [...(i === 0 ? [] : ["A"]), "B"].map(
-                        letter => Assignment(`Discussion ${i}${letter}`, 1.25),
+                        letter => Assignment(`Discussion ${i}${letter}`, 1.25, 1.25, true),
                     ),
                 ),
             ], 20),

@@ -12,6 +12,7 @@ module.exports = (shipit) => {
 
     shipit.task("default", async () => {
         // await shipit.local("yarn build");
+
         await shipit.copyToRemote("./deploy", "/home/ff/ee16a/status_check");
         const rawgrep = await shipit.remote("ps ax|grep gunicorn");
         const lines = rawgrep[0].stdout.split("\n");

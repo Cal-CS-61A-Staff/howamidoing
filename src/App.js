@@ -68,7 +68,7 @@ class App extends Component {
 
             for (let i = 0; i !== header.length; ++i) {
                 if (LOOKUP[header[i]]) {
-                    scores[header[i]] = data[i] * LOOKUP[header[i]].weighting;
+                    scores[header[i]] = data[i];
                 }
             }
         } else if (retry) {
@@ -97,7 +97,6 @@ class App extends Component {
     };
 
     refresh = () => {
-        console.log("refresh!");
         window.location.replace("./login");
     };
 
@@ -120,7 +119,7 @@ class App extends Component {
         if (!curr.isTopic) {
             totals[curr.name] = (scores[curr.name] !== undefined)
                 ? Number.parseFloat(scores[curr.name]) : NaN;
-            return totals[curr.name];
+            return totals[curr.name] * curr.weighting;
         }
 
         const childTotals = [];

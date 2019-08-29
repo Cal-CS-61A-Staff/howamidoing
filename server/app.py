@@ -1,7 +1,3 @@
-""" This file is a sample implementation of OAuth with OK.
-If you are running OK Locally, make sure you are using different
-hostnames for the two apps (otherwise Flask will clobber your session)
-"""
 import os
 import csv
 import urllib.parse
@@ -11,12 +7,12 @@ from flask import Flask, redirect, url_for, session, request, jsonify, abort, se
 from flask_oauthlib.client import OAuth
 import requests
 
-from .secrets import SECRET
+from server.secrets import SECRET
 
 CONSUMER_KEY = "61a-grade-view"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-GRADES_PATH = os.path.join(BASE_DIR, "./grades.csv")
+GRADES_PATH = os.path.join(BASE_DIR, "grades.csv")
 
 
 def create_client(app):
