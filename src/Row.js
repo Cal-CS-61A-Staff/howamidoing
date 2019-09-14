@@ -22,7 +22,7 @@ export default function Row(props) {
                 value={props.plannedScore}
                 placeholder={props.placeholder}
                 readOnly={props.readOnly}
-                onChange={val => props.onChange(props.name, val)}
+                onChange={val => (props.booleanValued ? props.onChange(props.name, val * props.maxScore) : props.onChange(props.name, val))}
                 booleanValued={props.booleanValued}
             />
         ) : formatScore(props.score);

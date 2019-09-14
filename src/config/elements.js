@@ -55,13 +55,12 @@ export function Topic(name, children, cappedScore = Infinity, customCalculator, 
     };
 }
 
-export function Assignment(name, maxScore, weighting = 1, booleanValued = false) {
+export function Assignment(name, maxScore, booleanValued = false) {
     return {
         isTopic: false,
         name,
         maxScore,
         futureMaxScore: maxScore,
-        weighting,
         future: !header.includes(name),
         booleanValued,
     };

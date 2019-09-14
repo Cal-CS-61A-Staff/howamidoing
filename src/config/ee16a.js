@@ -27,10 +27,8 @@ function hwCalculator(hwScores) {
     const totalRawScore = rawScore + resubmissionBonus;
     if (Number.isNaN(totalRawScore)) {
         return NaN;
-    } else if (totalRawScore >= 8) {
-        return 10;
     } else {
-        return totalRawScore;
+        return Math.min(10, totalRawScore / 8 * 10);
     }
 }
 
@@ -52,7 +50,7 @@ export function createAssignments() {
                 Topic("Raw Homework Scores", [
                     ...range(15).map(i => Topic(`Final Homework ${i} Score`, [
                         Assignment(`Raw Self-Grade (HW ${i})`, 10),
-                        Assignment(`Resubmitted? (HW ${i})`, 1, 1, true),
+                        Assignment(`Resubmitted? (HW ${i})`, 1, true),
                         Assignment(`Resubmission Point Gain (HW ${i})`, 10),
                     ], 10, hwCalculator, true)),
                 ]),
@@ -60,22 +58,23 @@ export function createAssignments() {
                     Assignment("Raw self-grades for selected problems", 0),
                     Assignment("Adjusted self-grades for selected problems", 0),
                 ]),
-            ], 35, lst => lst.reduce((a, b) => a + b, 0) / 140 * 35),
+            ], 35, ([raw, factor]) => Math.min(1, raw * (factor || 1) / 140) * 35),
             Topic("Labs", [
                 ...["Imaging 1", "Imaging 2", "Imaging 3", "Touch 1", "Touch 2", "Touch 3A", "Touch 3B", "APS 1", "APS 2"].map(
-                    title => Always(Assignment(`${title}`, 1, 1, true)),
+                    title => Always(Assignment(`${title}`, 1, true)),
                 ),
             ], 45, labCalculator),
             Topic("Participation",
                 range(1, 16)
                     .flatMap(
                         i => ["A", "B"].map(
-                            (letter, offset) => Assignment(`Discussion ${i}${letter} (${getDiscDate(i, offset)})`, 1.25, 1.25, true),
+                            (letter, offset) => Assignment(`Discussion ${i}${letter} (${getDiscDate(i, offset)})`, 1, true),
                         ),
                     )
                     .filter(
                         ({ name }) => !["1A", "13B", "15A", "15B"].includes(name.split(" ")[1]),
-                    ), 20),
+                    ), 20,
+                scores => scores.reduce((a, b) => a + b) / 16 * 20),
         ]),
     ];
 }

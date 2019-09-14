@@ -70,6 +70,7 @@ export default class Topic extends Component {
                     readOnly={this.props.readOnly}
                     maxScore={displayedMaxScore}
                     onClick={this.toggleCollapse}
+                    future={this.props.schema.future}
                     indent={this.props.indent}
                     childrenCollapsed={this.state.collapsed}
                     collapsed={this.props.collapsed}

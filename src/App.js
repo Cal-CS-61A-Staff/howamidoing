@@ -119,7 +119,7 @@ class App extends Component {
         if (!curr.isTopic) {
             totals[curr.name] = (scores[curr.name] !== undefined)
                 ? Number.parseFloat(scores[curr.name]) : NaN;
-            return totals[curr.name] * curr.weighting;
+            return totals[curr.name];
         }
 
         const childTotals = [];
