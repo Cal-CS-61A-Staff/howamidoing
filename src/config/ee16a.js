@@ -34,6 +34,12 @@ function hwCalculator(hwScores) {
     }
 }
 
+function getDiscDate(index, offset) {
+    const out = new Date(2019, 8, 2);
+    out.setDate(out.getDate() + 7 * (index - 1) + offset * 2);
+    return out.toLocaleString("en-us", { month: "long", day: "numeric" });
+}
+
 export function createAssignments() {
     return [
         Topic("Raw Score", [
@@ -57,16 +63,19 @@ export function createAssignments() {
             ], 35, lst => lst.reduce((a, b) => a + b, 0) / 140 * 35),
             Topic("Labs", [
                 ...["Imaging 1", "Imaging 2", "Imaging 3", "Touch 1", "Touch 2", "Touch 3A", "Touch 3B", "APS 1", "APS 2"].map(
-                    title => Always(Assignment(`${title}`, 1)),
+                    title => Always(Assignment(`${title}`, 1, 1, true)),
                 ),
             ], 45, labCalculator),
-            Topic("Participation", [
-                ...range(16).flatMap(
-                    i => [...(i === 0 ? [] : ["A"]), "B"].map(
-                        letter => Assignment(`Discussion ${i}${letter}`, 1.25, 1.25, true),
-                    ),
-                ),
-            ], 20),
+            Topic("Participation",
+                range(1, 16)
+                    .flatMap(
+                        i => ["A", "B"].map(
+                            (letter, offset) => Assignment(`Discussion ${i}${letter} (${getDiscDate(i, offset)})`, 1.25, 1.25, true),
+                        ),
+                    )
+                    .filter(
+                        ({ name }) => !["1A", "13B", "15A", "15B"].includes(name.split(" ")[1]),
+                    ), 20),
         ]),
     ];
 }
