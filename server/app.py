@@ -1,9 +1,10 @@
+import json
 import os
 import csv
 import urllib.parse
 from werkzeug import security
 
-from flask import Flask, redirect, url_for, session, request, jsonify, abort, send_from_directory
+from flask import Flask, redirect, url_for, session, request, jsonify, render_template
 from flask_oauthlib.client import OAuth
 import requests
 
@@ -46,7 +47,13 @@ def create_client(app):
 
     @app.route("/")
     def index():
-        return send_from_directory("static", "index.html")
+        try:
+            with open("static/config/courseList.json") as config:
+                data = json.load(config)
+                host = request.headers['Host']
+                return render_template("index.html", courseCode=data.get(host, host))
+        except FileNotFoundError:
+            return render_template("index.html", courseCode="unknown")
 
     @app.route('/query/')
     def query():
@@ -114,7 +121,7 @@ def create_client(app):
     return remote
 
 
-app = Flask(__name__, static_url_path="", static_folder="static")
+app = Flask(__name__, static_url_path="", static_folder="static", template_folder="static")
 app.secret_key = SECRET
 create_client(app)
 

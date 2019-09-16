@@ -1,10 +1,7 @@
 import React from "react";
 import FinalNeededScoreTable from "./FinalNeededScoreTable.js";
-import {
-    canDisplayFinalGrades,
-    computeNeededFinalScore,
-    participationProvided,
-} from "./config/ee16a.js";
+
+const { canDisplayFinalGrades, computeNeededFinalScore, participationProvided } = window;
 
 export default function GradePlanner(props) {
     const { data: scores } = props;

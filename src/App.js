@@ -9,15 +9,19 @@ import $ from "jquery";
 import GradeTable from "./GradeTable.js";
 import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
-import { COURSE_CODE, createAssignments } from "./config/ee16a.js";
-import { setSchema } from "./config/elements.js";
+
 import LoginButton from "./LoginButton.js";
 
 let ASSIGNMENTS = [];
 
 let LOOKUP = {};
 
+let setSchema;
+let createAssignments;
+let COURSE_CODE;
+
 function initialize(header, scores) {
+    ({ setSchema, createAssignments, COURSE_CODE } = window);
     setSchema(header, scores);
     ASSIGNMENTS = createAssignments();
     LOOKUP = {};

@@ -10,12 +10,9 @@ module.exports = {
         node: true
     },
     globals: {
-        __static: true,
-        ExecutionVisualizer: true,
-        ELECTRON: true,
-        brython: true,
-        __BRYTHON__: true,
-        importScripts: true,
+        setSchema: "readonly",
+        createAssignments: "readonly",
+        COURSE_CODE: "readonly",
     },
     rules: {
         'import/no-unresolved': false,

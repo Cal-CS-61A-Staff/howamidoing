@@ -7,6 +7,12 @@ const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D
 
 export const COURSE_CODE = "16A";
 
+window.COURSE_CODE = COURSE_CODE;
+window.createAssignments = createAssignments;
+window.canDisplayFinalGrades = canDisplayFinalGrades;
+window.computeNeededFinalScore = computeNeededFinalScore;
+window.partipationProvided = participationProvided;
+
 function labCalculator(labScores) {
     const rawTotalLabScore = labScores.reduce((a, b) => a + b, 0);
     if (Number.isNaN(rawTotalLabScore)) {

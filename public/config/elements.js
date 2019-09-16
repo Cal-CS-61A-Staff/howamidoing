@@ -6,6 +6,8 @@ export function setSchema(_header, _scores) {
     scores = _scores;
 }
 
+window.setSchema = setSchema;
+
 /* eslint-disable no-param-reassign,dot-notation */
 export function range(a, b) {
     if (!b) {
