@@ -105,14 +105,14 @@ class App extends Component {
     };
 
     handleSetCourseworkToMax = () => {
-        for (const assignment of ASSIGNMENTS) {
-            this.recursivelyMaximize(assignment, this.state.plannedScores);
-        }
+        this.recursivelyMaximize(ASSIGNMENTS[0], this.state.plannedScores);
         this.forceUpdate();
     };
 
     handleSetParticipationToMax = () => {
-        this.recursivelyMaximize(LOOKUP["Participation Credits"], this.state.plannedScores);
+        for (const assignment of ASSIGNMENTS) {
+            this.recursivelyMaximize(assignment, this.state.plannedScores);
+        }
         this.forceUpdate();
     };
 

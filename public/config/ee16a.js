@@ -11,7 +11,7 @@ window.COURSE_CODE = COURSE_CODE;
 window.createAssignments = createAssignments;
 window.canDisplayFinalGrades = canDisplayFinalGrades;
 window.computeNeededFinalScore = computeNeededFinalScore;
-window.partipationProvided = participationProvided;
+window.participationProvided = participationProvided;
 
 function labCalculator(labScores) {
     const rawTotalLabScore = labScores.reduce((a, b) => a + b, 0);

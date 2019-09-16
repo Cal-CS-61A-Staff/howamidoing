@@ -23,7 +23,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-grades.csv
+**/*grades.csv
 secrets.py
 
 .idea/workspace.iml

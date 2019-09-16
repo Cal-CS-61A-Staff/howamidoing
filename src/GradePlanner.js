@@ -1,9 +1,8 @@
 import React from "react";
 import FinalNeededScoreTable from "./FinalNeededScoreTable.js";
 
-const { canDisplayFinalGrades, computeNeededFinalScore, participationProvided } = window;
-
 export default function GradePlanner(props) {
+    const { canDisplayFinalGrades, computeNeededFinalScore, participationProvided } = window;
     const { data: scores } = props;
     if (!canDisplayFinalGrades(scores)) {
         return (
