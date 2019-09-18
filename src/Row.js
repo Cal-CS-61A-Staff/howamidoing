@@ -2,8 +2,8 @@ import React from "react";
 import "./Row.css";
 import ScoreEntry from "./ScoreEntry.js";
 
-function formatScore(score, places = 1) {
-    return Number.parseFloat(score).toFixed(Math.max(places, (score.toString().split(".")[1] || "").length));
+function formatScore(score, places = 2) {
+    return Number.parseFloat(score).toFixed(places);
 }
 
 export default function Row(props) {

@@ -1,5 +1,5 @@
 import {
-    Always, Assignment, range, Topic,
+    Always, Assignment, Hidden, range, sum, Topic,
 } from "./elements.js";
 
 const BINS = [300, 279, 270, 252, 225, 204, 195, 186, 174, 171, 165, 159, 0];
@@ -7,14 +7,18 @@ const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D
 
 export const COURSE_CODE = "16A";
 
+export const WARNING = `Please note that these scores are tentative and serve only as a rough guideline for your performance in the class. Grades listed here do not guarantee that assignment grade or final grade; we reserve the right to change these grades in the event of any mitigating circumstances (e.g., cheating, another violation of course policy, etc.) or errors in grading.
+We will also be auditing these grades throughout the course of the semester - the Status Check is in an Alpha version and there will likely be many issues with the grades displayed. <b>Do not count on these grades as fully accurate - again, this is intended to serve as a rough guideline for how you're doing in the class. If you spot a possible issue with any of your grades, please let us know using this form (do NOT email):</b> <a href="https://forms.gle/m7GEAFfnrM1ErckH7">https://forms.gle/m7GEAFfnrM1ErckH7</a>`;
+
 window.COURSE_CODE = COURSE_CODE;
 window.createAssignments = createAssignments;
 window.canDisplayFinalGrades = canDisplayFinalGrades;
 window.computeNeededFinalScore = computeNeededFinalScore;
 window.participationProvided = participationProvided;
+window.WARNING = WARNING;
 
 function labCalculator(labScores) {
-    const rawTotalLabScore = labScores.reduce((a, b) => a + b, 0);
+    const rawTotalLabScore = sum(labScores);
     if (Number.isNaN(rawTotalLabScore)) {
         return NaN;
     } else if (rawTotalLabScore === 9) {
@@ -28,9 +32,10 @@ function labCalculator(labScores) {
     }
 }
 
-function hwCalculator(hwScores) {
-    const [rawScore, , resubmissionBonus] = hwScores;
-    const totalRawScore = rawScore + resubmissionBonus;
+function hwCalculator(hwScores, planningEnabled) {
+    const [rawScore, , resubmissionBonus, factor] = hwScores;
+    const realFactor = planningEnabled ? factor || 0 : factor;
+    const totalRawScore = rawScore + resubmissionBonus + factor;
     if (Number.isNaN(totalRawScore)) {
         return NaN;
     } else {
@@ -44,6 +49,16 @@ function getDiscDate(index, offset) {
     return out.toLocaleString("en-us", { month: "long", day: "numeric" });
 }
 
+function adjustmentCalculator([raw, reader, num]) {
+    return (reader - raw) / num;
+}
+
+
+function overallAdjustmentCalculator(arr) {
+    return sum(arr) / arr.length;
+}
+
+
 export function createAssignments() {
     return [
         Topic("Raw Score", [
@@ -54,17 +69,21 @@ export function createAssignments() {
             ]),
             Topic("Homework", [
                 Topic("Raw Homework Scores", [
-                    ...range(15).map(i => Topic(`Final Homework ${i} Score`, [
+                    ...range(15).map(i => Topic(`Final (Scaled) Homework ${i} Score`, [
                         Assignment(`Raw Self-Grade (HW ${i})`, 10),
                         Assignment(`Resubmitted? (HW ${i})`, 1, true),
                         Assignment(`Resubmission Point Gain (HW ${i})`, 10),
+                        Always(Hidden(Assignment("Reader Adjustment Factor"))),
                     ], 10, hwCalculator, true)),
                 ]),
                 Topic("Reader Adjustment Factor", [
-                    Assignment("Raw self-grades for selected problems", 0),
-                    Assignment("Adjusted self-grades for selected problems", 0),
-                ]),
-            ], 35, ([raw, factor]) => Math.min(1, raw * (factor || 1) / 140) * 35),
+                    ...range(15).map(i => Topic(`Homework ${i} Adjustment`, [
+                        Assignment(`Raw Self-Grade for Selected Problems (HW ${i})`),
+                        Assignment(`Reader Grades for Selected Problems (HW ${i})`),
+                        Assignment(`Number of Selected Problems (HW ${i})`),
+                    ], null, adjustmentCalculator, true)),
+                ], null, overallAdjustmentCalculator, true),
+            ], 35, ([raw]) => raw / 140 * 35),
             Topic("Labs", [
                 ...["Imaging 1", "Imaging 2", "Imaging 3", "Touch 1", "Touch 2", "Touch 3A", "Touch 3B", "APS 1", "APS 2"].map(
                     title => Always(Assignment(`${title}`, 1, true)),
@@ -79,8 +98,7 @@ export function createAssignments() {
                     )
                     .filter(
                         ({ name }) => !["1A", "13B", "15A", "15B"].includes(name.split(" ")[1]),
-                    ), 20,
-                scores => scores.reduce((a, b) => a + b) / 16 * 20),
+                    ), 20),
         ]),
     ];
 }

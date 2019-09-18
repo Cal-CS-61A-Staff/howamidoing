@@ -8,6 +8,10 @@ export function setSchema(_header, _scores) {
 
 window.setSchema = setSchema;
 
+export function sum(array) {
+    return array.reduce((a, b) => a + b, 0);
+}
+
 /* eslint-disable no-param-reassign,dot-notation */
 export function range(a, b) {
     if (!b) {
@@ -25,7 +29,7 @@ export function Topic(name, children, cappedScore = Infinity, customCalculator, 
     let future = true;
     const maxChildScores = [];
     for (const child of children) {
-        if (!child.future) {
+        if (!child.future && !child.hidden) {
             future = false;
             maxChildScores.push(child.maxScore);
         }
@@ -45,6 +49,14 @@ export function Topic(name, children, cappedScore = Infinity, customCalculator, 
         maxScore = Math.min(cappedScore, maxChildScores.reduce((a, b) => a + b, 0));
         futureMaxScore = Math.min(cappedScore, maxFutureChildScores.reduce((a, b) => a + b, 0));
     }
+
+    if (!maxScore) {
+        maxScore = cappedScore;
+    }
+    if (!futureMaxScore) {
+        futureMaxScore = cappedScore;
+    }
+
     return {
         isTopic: true,
         name,
@@ -54,6 +66,7 @@ export function Topic(name, children, cappedScore = Infinity, customCalculator, 
         customCalculator,
         future,
         lockedChildren,
+        hidden: false,
     };
 }
 
@@ -65,10 +78,16 @@ export function Assignment(name, maxScore, booleanValued = false) {
         futureMaxScore: maxScore,
         future: !header.includes(name),
         booleanValued,
+        hidden: false,
     };
 }
 
 export function Always(elem) {
     elem.future = false;
+    return elem;
+}
+
+export function Hidden(elem) {
+    elem.hidden = true;
     return elem;
 }

@@ -22,7 +22,16 @@ export default class Topic extends Component {
             if (!this.props.future && elem.future) {
                 continue;
             }
-            if (!elem.isTopic || (elem.future && elem.lockedChildren)) {
+
+            const displayedScore = this.props.future ? this.props.planned[elem.name] : this.props.data[elem.name];
+
+            if (elem.hidden && Number.isNaN(displayedScore)) {
+                continue;
+            }
+
+            if (
+                !elem.isTopic || (elem.lockedChildren && (elem.future || Number.isNaN(this.props.data[elem.name])))
+            ) {
                 rows.push(
                     <Row
                         name={elem.name}

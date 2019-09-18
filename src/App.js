@@ -117,8 +117,12 @@ class App extends Component {
     };
 
     computeTotals(curr, scores, totals) {
+        if (totals[curr.name]) {
+            return totals[curr.name];
+        }
+
         if (curr.future && !this.state.future) {
-            return 0;
+            return NaN;
         }
         if (!curr.isTopic) {
             totals[curr.name] = (scores[curr.name] !== undefined)
@@ -129,14 +133,19 @@ class App extends Component {
         const childTotals = [];
 
         let out = 0;
-        for (const child of curr.children) {
+        for (const child of curr.children.slice().reverse()) {
+            if (child.future && !this.state.future) {
+                continue;
+            }
             const childTotal = this.computeTotals(child, scores, totals);
             out += childTotal;
             childTotals.push(childTotal);
         }
 
+        childTotals.reverse();
+
         if (curr.customCalculator) {
-            out = curr.customCalculator(childTotals);
+            out = curr.customCalculator(childTotals, this.state.future);
         }
 
         const limit = this.state.future ? curr.futureMaxScore : curr.maxScore;
@@ -150,7 +159,6 @@ class App extends Component {
         if (scores[curr.name] !== undefined
             && !Number.isNaN(Number.parseFloat(scores[curr.name]))) {
             totals[curr.name] = Number.parseFloat(scores[curr.name]);
-            return totals[curr.name];
         }
 
         return out;
@@ -165,9 +173,14 @@ class App extends Component {
             this.computeTotals(assignment, this.state.plannedScores, plannedTotals);
         }
 
+        const warning = window.WARNING &&
+            // eslint-disable-next-line react/no-danger
+            <div className="alert alert-danger" dangerouslySetInnerHTML={{__html: window.WARNING}} />;
+
         const contents = this.state.success
             ? (
                 <>
+                    {warning}
                     <FutureCheckBox
                         onChange={this.handleFutureCheckboxChange}
                         checked={this.state.future}
@@ -201,6 +214,7 @@ class App extends Component {
                             <strong>{COURSE_CODE}</strong>
                             {" "}
                             Status Check
+                            <span className="badge badge-danger warningBadge">Beta</span>
                         </h1>
                         {contents}
                     </div>
