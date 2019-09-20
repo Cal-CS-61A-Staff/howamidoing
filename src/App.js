@@ -78,6 +78,14 @@ class App extends Component {
         } else if (retry) {
             this.refresh();
         }
+
+        const plannedScores = extend(scores);
+        for (const elem of Object.values(LOOKUP)) {
+            if (elem.default) {
+                plannedScores[elem.name] = NaN;
+            }
+        }
+
         this.setState({ scores, plannedScores: extend(scores) });
     }
 
@@ -117,13 +125,19 @@ class App extends Component {
     };
 
     computeTotals(curr, scores, totals) {
-        if (totals[curr.name]) {
+        if (totals[curr.name]) { // TODO: remove this kludge
             return totals[curr.name];
         }
 
         if (curr.future && !this.state.future) {
             return NaN;
         }
+
+        // if (curr.default && this.state.future) {
+        //     totals[curr.name] = NaN;
+        //     return NaN;
+        // }
+
         if (!curr.isTopic) {
             totals[curr.name] = (scores[curr.name] !== undefined)
                 ? Number.parseFloat(scores[curr.name]) : NaN;
@@ -159,6 +173,7 @@ class App extends Component {
         if (scores[curr.name] !== undefined
             && !Number.isNaN(Number.parseFloat(scores[curr.name]))) {
             totals[curr.name] = Number.parseFloat(scores[curr.name]);
+            return totals[curr.name];
         }
 
         return out;
@@ -168,14 +183,26 @@ class App extends Component {
         const totals = {};
         const plannedTotals = {};
 
+        const scores = extend(this.state.scores);
+
+        if (this.state.future) {
+            for (const elem of Object.values(LOOKUP)) {
+                if (elem.default) {
+                    totals[elem.name] = NaN;
+                    scores[elem.name] = NaN;
+                }
+            }
+        }
+
+
         for (const assignment of ASSIGNMENTS) {
-            this.computeTotals(assignment, this.state.scores, totals);
+            this.computeTotals(assignment, scores, totals);
             this.computeTotals(assignment, this.state.plannedScores, plannedTotals);
         }
 
-        const warning = window.WARNING &&
+        const warning = window.WARNING
             // eslint-disable-next-line react/no-danger
-            <div className="alert alert-danger" dangerouslySetInnerHTML={{__html: window.WARNING}} />;
+            && <div className="alert alert-danger" dangerouslySetInnerHTML={{ __html: window.WARNING }} />;
 
         const contents = this.state.success
             ? (

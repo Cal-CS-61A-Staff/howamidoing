@@ -29,6 +29,8 @@ export default function Row(props) {
 
     const maxScore = (!props.booleanValued && props.maxScore) ? ` / ${formatScore(props.maxScore)}` : "";
 
+    const displayedScore = !props.noScore && score;
+
     return (
         <tr onClick={props.onClick} className={className}>
             <td style={{ paddingLeft: 10 + 40 * props.indent }}>
@@ -44,7 +46,7 @@ export default function Row(props) {
             </td>
             <td>
                 <div className="collapse show">
-                    {score}
+                    {displayedScore}
                     {maxScore}
                 </div>
             </td>

@@ -1,5 +1,14 @@
 import {
-    Always, Assignment, Hidden, range, sum, Topic,
+    Always,
+    Assignment,
+    BooleanValued,
+    Hidden,
+    LockedChildren,
+    NoScore,
+    OnlyDefault,
+    range,
+    sum,
+    Topic,
 } from "./elements.js";
 
 const BINS = [300, 279, 270, 252, 225, 204, 195, 186, 174, 171, 165, 159, 0];
@@ -19,23 +28,24 @@ window.WARNING = WARNING;
 
 function labCalculator(labScores) {
     const rawTotalLabScore = sum(labScores);
+    const numLabs = labScores.filter(x => !Number.isNaN(x)).length;
     if (Number.isNaN(rawTotalLabScore)) {
         return NaN;
-    } else if (rawTotalLabScore === 9) {
+    } else if (rawTotalLabScore === numLabs) {
         return 45;
-    } else if (rawTotalLabScore === 8) {
+    } else if (rawTotalLabScore === numLabs - 1) {
         return 42;
-    } else if (rawTotalLabScore === 7) {
+    } else if (rawTotalLabScore === numLabs - 2) {
         return 22;
     } else {
         return 0;
     }
 }
 
-function hwCalculator(hwScores, planningEnabled) {
+function hwCalculator(hwScores) {
     const [rawScore, , resubmissionBonus, factor] = hwScores;
-    const realFactor = planningEnabled ? factor || 0 : factor;
     const totalRawScore = rawScore + resubmissionBonus + factor;
+    console.log(hwScores, totalRawScore);
     if (Number.isNaN(totalRawScore)) {
         return NaN;
     } else {
@@ -49,16 +59,6 @@ function getDiscDate(index, offset) {
     return out.toLocaleString("en-us", { month: "long", day: "numeric" });
 }
 
-function adjustmentCalculator([raw, reader, num]) {
-    return (reader - raw) / num;
-}
-
-
-function overallAdjustmentCalculator(arr) {
-    return sum(arr) / arr.length;
-}
-
-
 export function createAssignments() {
     return [
         Topic("Raw Score", [
@@ -69,31 +69,31 @@ export function createAssignments() {
             ]),
             Topic("Homework", [
                 Topic("Raw Homework Scores", [
-                    ...range(15).map(i => Topic(`Final (Scaled) Homework ${i} Score`, [
+                    ...range(15).map(i => LockedChildren(Topic(`Final (Scaled) Homework ${i} Score`, [
                         Assignment(`Raw Self-Grade (HW ${i})`, 10),
-                        Assignment(`Resubmitted? (HW ${i})`, 1, true),
+                        BooleanValued(Assignment(`Resubmitted? (HW ${i})`, 1)),
                         Assignment(`Resubmission Point Gain (HW ${i})`, 10),
-                        Always(Hidden(Assignment("Reader Adjustment Factor"))),
-                    ], 10, hwCalculator, true)),
+                        OnlyDefault(Always(Hidden(Assignment("Reader Adjustment Factor")))),
+                    ], 10, hwCalculator))),
                 ]),
-                Topic("Reader Adjustment Factor", [
-                    ...range(15).map(i => Topic(`Homework ${i} Adjustment`, [
-                        Assignment(`Raw Self-Grade for Selected Problems (HW ${i})`),
+                OnlyDefault(Always(Topic("Reader Adjustment Factor", [
+                    ...range(15).map(i => LockedChildren(NoScore(Topic(`Homework ${i} Adjustment`, [
                         Assignment(`Reader Grades for Selected Problems (HW ${i})`),
+                        Assignment(`Raw Self-Grade for Selected Problems (HW ${i})`),
                         Assignment(`Number of Selected Problems (HW ${i})`),
-                    ], null, adjustmentCalculator, true)),
-                ], null, overallAdjustmentCalculator, true),
-            ], 35, ([raw]) => raw / 140 * 35),
+                    ], null)))),
+                ], null))),
+            ], 35, ([raw]) => raw / 150 * 35),
             Topic("Labs", [
                 ...["Imaging 1", "Imaging 2", "Imaging 3", "Touch 1", "Touch 2", "Touch 3A", "Touch 3B", "APS 1", "APS 2"].map(
-                    title => Always(Assignment(`${title}`, 1, true)),
+                    title => Assignment(`${title}`, 1),
                 ),
             ], 45, labCalculator),
             Topic("Participation",
                 range(1, 16)
                     .flatMap(
                         i => ["A", "B"].map(
-                            (letter, offset) => Assignment(`Discussion ${i}${letter} (${getDiscDate(i, offset)})`, 1, true),
+                            (letter, offset) => Assignment(`Discussion ${i}${letter} (${getDiscDate(i, offset)})`, 1.25),
                         ),
                     )
                     .filter(

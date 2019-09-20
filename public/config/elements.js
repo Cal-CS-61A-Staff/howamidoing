@@ -25,7 +25,7 @@ export function range(a, b) {
     return out;
 }
 
-export function Topic(name, children, cappedScore = Infinity, customCalculator, lockedChildren = false) {
+export function Topic(name, children, cappedScore = Infinity, customCalculator) {
     let future = true;
     const maxChildScores = [];
     for (const child of children) {
@@ -65,20 +65,16 @@ export function Topic(name, children, cappedScore = Infinity, customCalculator, 
         futureMaxScore,
         customCalculator,
         future,
-        lockedChildren,
-        hidden: false,
     };
 }
 
-export function Assignment(name, maxScore, booleanValued = false) {
+export function Assignment(name, maxScore) {
     return {
         isTopic: false,
         name,
         maxScore,
         futureMaxScore: maxScore,
         future: !header.includes(name),
-        booleanValued,
-        hidden: false,
     };
 }
 
@@ -89,5 +85,25 @@ export function Always(elem) {
 
 export function Hidden(elem) {
     elem.hidden = true;
+    return elem;
+}
+
+export function OnlyDefault(elem) {
+    elem.default = true;
+    return elem;
+}
+
+export function NoScore(elem) {
+    elem.noScore = true;
+    return elem;
+}
+
+export function LockedChildren(elem) {
+    elem.lockedChildren = true;
+    return elem;
+}
+
+export function BooleanValued(elem) {
+    elem.booleanValued = true;
     return elem;
 }

@@ -30,7 +30,7 @@ export default class Topic extends Component {
             }
 
             if (
-                !elem.isTopic || (elem.lockedChildren && (elem.future || Number.isNaN(this.props.data[elem.name])))
+                !elem.isTopic || (elem.lockedChildren && (elem.future || (Number.isNaN(this.props.data[elem.name]) && Number.isNaN(this.props.plannedTotals[elem.name]))))
             ) {
                 rows.push(
                     <Row
@@ -41,6 +41,7 @@ export default class Topic extends Component {
                         booleanValued={elem.booleanValued}
                         readOnly={!Number.isNaN(this.props.data[elem.name])}
                         maxScore={elem.isTopic ? elem.futureMaxScore : elem.maxScore}
+                        noScore={elem.noScore}
                         future={elem.future}
                         key={elem.name}
                         indent={this.props.indent + 1}
@@ -79,6 +80,7 @@ export default class Topic extends Component {
                     readOnly={this.props.readOnly}
                     maxScore={displayedMaxScore}
                     onClick={this.toggleCollapse}
+                    noScore={this.props.schema.noScore}
                     future={this.props.schema.future}
                     indent={this.props.indent}
                     childrenCollapsed={this.state.collapsed}
