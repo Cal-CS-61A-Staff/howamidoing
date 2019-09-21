@@ -1,14 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import App from "./App";
+import StudentView from "./App";
 import * as serviceWorker from "./serviceWorker";
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(<StudentView />, document.getElementById("root"));
 
 if (module.hot) {
     module.hot.accept("./App", () => {
-        const NextApp = require("./App").default;
+        const NextApp = require("./App").StudentView;
         ReactDOM.render(
             <NextApp />,
             document.getElementById("root"),

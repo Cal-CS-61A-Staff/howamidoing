@@ -32,7 +32,7 @@ export default function Row(props) {
     const displayedScore = !props.noScore && score;
 
     return (
-        <tr onClick={props.onClick} className={className}>
+        <tr onClick={props.onClick} className={className} style={{ color: props.hidden ? "gray" : "black" }}>
             <td style={{ paddingLeft: 10 + 40 * props.indent }}>
                 {props.childrenCollapsed !== undefined ? (
                     <button type="button" className="close closeButton" aria-label="Close">

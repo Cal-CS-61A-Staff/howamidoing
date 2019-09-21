@@ -15,7 +15,6 @@
     "eject": "react-scripts eject",
     "16a-deploy": "cd deploy && mv 16a-grades.csv grades.csv && rm 61a-grades.csv && gcloud builds submit --tag gcr.io/banded-syntax-252420/16a-grades && gcloud beta run deploy statuscheck --image gcr.io/banded-syntax-252420/16a-grades --platform managed",
     "61a-deploy": "cd deploy && mv 61a-grades.csv grades.csv && rm 16a-grades.csv && rm -rf .git && git init && git add -A && git commit -m \"init\" && git remote add dokku dokku@apps.cs61a.org:howamidoing && git push --force dokku master"
-
   },
   "browserslist": {
     "production": [
@@ -33,7 +32,9 @@
     "bootstrap": "^4.3.1",
     "eslint-config-airbnb": "^17.1.1",
     "jquery": "^3.4.1",
+    "katex": "^0.11.1",
     "popper.js": "^1.15.0",
+    "react-latex": "^1.4.0",
     "shipit-cli": "^5.0.0",
     "shipit-deploy": "^5.0.0"
   }

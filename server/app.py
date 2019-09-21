@@ -15,6 +15,29 @@ CONSUMER_KEY = "61a-grade-view"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GRADES_PATH = os.path.join(BASE_DIR, "grades.csv")
 
+AUTHORIZED_ROLES = ["staff", "instructor"]
+
+
+def get_course_code():
+    try:
+        with open("static/config/courseList.json") as config:
+            data = json.load(config)
+            host = request.headers['Host']
+            return data.get(host, host)
+    except FileNotFoundError:
+        return "eecs16a"
+
+
+def is_staff(remote):
+    ret = remote.get('user', token=session['dev_token'])
+    for course in ret.data["data"]["participations"]:
+        if course["role"] not in AUTHORIZED_ROLES:
+            continue
+        if course["course"]["display_name"].lower().replace(" ", "") != get_course_code():
+            continue
+        return True
+    return False
+
 
 def create_client(app):
     oauth = OAuth(app)
@@ -43,35 +66,38 @@ def create_client(app):
             url_parts[4] = urllib.parse.urlencode(query)
             uri = urllib.parse.urlunparse(url_parts)
         return uri, headers, body
+
     remote.pre_request = check_req
 
     @app.route("/")
     def index():
-        try:
-            with open("static/config/courseList.json") as config:
-                data = json.load(config)
-                host = request.headers['Host']
-                return render_template("index.html", courseCode=data.get(host, host))
-        except FileNotFoundError:
-            return render_template("index.html", courseCode="unknown")
+        return render_template("index.html", courseCode=get_course_code())
 
     @app.route('/query/')
     def query():
         try:
             if 'dev_token' in session:
                 ret = remote.get('user', token=session['dev_token'])
+
                 email = ret.data['data']['email']
-                # email = "some.random@berkeley.edu"
-                with open(GRADES_PATH) as grades:
-                    reader = csv.reader(grades)
-                    header = next(reader)
-                    for row in reader:
-                        if row[0] == email:
-                            return jsonify({
-                                "success": True,
-                                "header": header,
-                                "data": row,
-                            })
+
+                target = request.args.get("target", None)
+
+                if is_staff(remote):
+                    if target:
+                        email = target
+                    else:
+                        return jsonify({
+                            "success": True,
+                            "isStaff": True,
+                        })
+
+                    if email in CACHED_CSV:
+                        return jsonify({
+                            "success": True,
+                            "header": CSV_HEADER,
+                            "data": CACHED_CSV[email],
+                        })
             else:
                 return jsonify({
                     "success": False,
@@ -124,6 +150,13 @@ def create_client(app):
 app = Flask(__name__, static_url_path="", static_folder="static", template_folder="static")
 app.secret_key = SECRET
 create_client(app)
+
+CACHED_CSV = {}
+with open(GRADES_PATH) as grades:
+    reader = csv.reader(grades)
+    CSV_HEADER = next(reader)
+    for row in reader:
+        CACHED_CSV[row[0]] = row
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000)

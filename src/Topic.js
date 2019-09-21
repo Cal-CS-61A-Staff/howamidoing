@@ -38,6 +38,7 @@ export default class Topic extends Component {
                         score={this.props.data[elem.name]}
                         plannedScore={this.props.planned[elem.name]}
                         placeholder={this.props.plannedTotals[elem.name]}
+                        hidden={elem.hidden}
                         booleanValued={elem.booleanValued}
                         readOnly={!Number.isNaN(this.props.data[elem.name])}
                         maxScore={elem.isTopic ? elem.futureMaxScore : elem.maxScore}
