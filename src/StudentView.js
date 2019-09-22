@@ -9,8 +9,6 @@ import GradeTable from "./GradeTable.js";
 import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
 
-import LoginButton from "./LoginButton.js";
-
 let ASSIGNMENTS = [];
 
 let LOOKUP = {};
@@ -50,33 +48,21 @@ function extend(scores) {
 class StudentView extends Component {
     constructor(props) {
         super(props);
+
+        const scores = {};
+        initialize(props.header, props.data);
+
+        for (let i = 0; i !== props.header.length; ++i) {
+            if (LOOKUP[props.header[i]]) {
+                scores[props.header[i]] = props.data[i];
+            }
+        }
+
         this.state = {
-            scores: [],
-            plannedScores: [],
+            scores,
+            plannedScores: extend(scores),
             future: false,
         };
-    }
-
-    static getDerivedStateFromProps(props) {
-        const scores = {};
-        if (props.success) {
-            initialize(props.header, props.data);
-
-            for (let i = 0; i !== props.header.length; ++i) {
-                if (LOOKUP[props.header[i]]) {
-                    scores[props.header[i]] = props.data[i];
-                }
-            }
-        }
-
-        const plannedScores = extend(scores);
-        for (const elem of Object.values(LOOKUP)) {
-            if (elem.default) {
-                plannedScores[elem.name] = NaN;
-            }
-        }
-
-        return { scores, plannedScores: extend(scores) };
     }
 
     handleFutureCheckboxChange = () => {
@@ -96,10 +82,6 @@ class StudentView extends Component {
         } else if (topic.name !== "Final" && Number.isNaN(plannedScores[topic.name])) {
             plannedScores[topic.name] = topic.maxScore;
         }
-    };
-
-    refresh = () => {
-        window.location.replace("./login");
     };
 
     handleSetCourseworkToMax = () => {
@@ -178,12 +160,10 @@ class StudentView extends Component {
         if (this.state.future) {
             for (const elem of Object.values(LOOKUP)) {
                 if (elem.default) {
-                    totals[elem.name] = NaN;
                     scores[elem.name] = NaN;
                 }
             }
         }
-
 
         for (const assignment of ASSIGNMENTS) {
             this.computeTotals(assignment, scores, totals);
@@ -194,37 +174,35 @@ class StudentView extends Component {
             // eslint-disable-next-line react/no-danger
             && <div className="alert alert-danger" dangerouslySetInnerHTML={{ __html: window.WARNING }} />;
 
-        return this.props.success
-            ? (
-                <>
-                    {warning}
-                    {window.ENABLE_PLANNING
+        return (
+            <>
+                {warning}
+                {window.ENABLE_PLANNING
                     && (
                         <FutureCheckBox
                             onChange={this.handleFutureCheckboxChange}
                             checked={this.state.future}
                         />
                     )
-                    }
-                    <br />
-                    {this.state.future && (
-                        <GradePlanner
-                            data={plannedTotals}
-                            onSetCourseworkToMax={this.handleSetCourseworkToMax}
-                            onSetParticipationToMax={this.handleSetParticipationToMax}
-                        />
-                    )}
-                    <GradeTable
-                        schema={ASSIGNMENTS}
-                        data={totals}
-                        planned={this.state.plannedScores}
-                        plannedTotals={plannedTotals}
-                        future={this.state.future}
-                        onFutureScoreChange={this.handleFutureScoreChange}
+                }
+                <br />
+                {this.state.future && (
+                    <GradePlanner
+                        data={plannedTotals}
+                        onSetCourseworkToMax={this.handleSetCourseworkToMax}
+                        onSetParticipationToMax={this.handleSetParticipationToMax}
                     />
-                </>
-            )
-            : <LoginButton onClick={this.refresh} />;
+                )}
+                <GradeTable
+                    schema={ASSIGNMENTS}
+                    data={totals}
+                    planned={this.state.plannedScores}
+                    plannedTotals={plannedTotals}
+                    future={this.state.future}
+                    onFutureScoreChange={this.handleFutureScoreChange}
+                />
+            </>
+        );
     }
 }
 

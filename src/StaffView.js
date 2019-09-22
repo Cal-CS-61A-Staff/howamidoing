@@ -1,23 +1,26 @@
-import React, { useRef } from "react";
+import React, { useState } from "react";
+import Select2 from "react-select2-wrapper";
+import "react-select2-wrapper/css/select2.css";
 
-export default function StaffView({ handleSubmit }) {
-    const emailInputRef = useRef(null);
+import $ from "jquery";
+
+export default function StaffView({ students, handleSubmit }) {
+    const [selected, setSelected] = useState(null);
 
     return (
         <form onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit(emailInputRef.current.value);
+            handleSubmit(selected);
         }}
         >
             <div className="form-group">
                 <label htmlFor="inputEmail">Enter target student email address</label>
-                <input
-                    ref={emailInputRef}
-                    type="email"
-                    className="form-control"
-                    id="inputEmail"
-                    aria-describedby="emailHelp"
-                    placeholder="Enter email"
+                <br />
+                <Select2
+                    style={{ width: "100%" }}
+                    value={selected}
+                    onSelect={x => setSelected($(x.target).val())}
+                    data={students}
                 />
             </div>
             <button type="submit" className="btn btn-primary">Submit</button>

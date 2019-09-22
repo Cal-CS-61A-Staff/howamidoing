@@ -2,7 +2,7 @@ import {
     Assignment, range, Topic,
 } from "./elements.js";
 
-const BINS = [300, 279, 270, 252, 225, 204, 195, 186, 174, 171, 165, 159, 0];
+const BINS = [300, 285, 270, 250, 225, 205, 195, 185, 175, 170, 165, 160, 0];
 const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"];
 
 export const COURSE_CODE = "61A";
@@ -33,7 +33,7 @@ export function createAssignments() {
             ]),
             Topic("Projects", [
                 Topic("Hog Project", [
-                    Assignment("Hog (Total)", 25),
+                    Assignment("Hog (Total)", 23),
                     Assignment("Hog Checkpoint (Total)", 1),
                 ]),
                 Assignment("Typing Test", 25),
@@ -42,11 +42,13 @@ export function createAssignments() {
             ]),
             Topic("Section Participation", [
                 ...range(1, 13).map(i => Assignment(`Discussion ${i} (Total)`, 1)),
+                ...range(1, 13).map(i => Assignment(`Lab ${i} (Total)`, 1)),
             ], 10),
         ]),
-        Topic("Labs", [
-            ...[1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12].map(i => Assignment(`Lab ${i} (Total)`, 1)),
-        ]),
+        Topic("Section Participation (for clobber)", [
+            ...range(1, 13).map(i => Assignment(`Discussion ${i} (Total)`, 1)),
+            ...range(1, 13).map(i => Assignment(`Lab ${i} (Total)`, 1)),
+        ], 20),
     ];
 }
 
@@ -61,13 +63,28 @@ export function computeNeededFinalScore(scores) {
     const {
         Homework, Projects, "Midterm 1": MT1, "Midterm 2": MT2, "Section Participation": Participation,
     } = scores;
-    const totalNonFinal = Homework + Projects + Participation + MT1 + MT2;
+
+    let { "Section Participation (for clobber)": Clobber } = scores;
+    if (!Clobber) {
+        Clobber = 0;
+    }
+
+    const totalNonFinal = Homework
+                        + Projects
+                        + Participation
+                        + MT1
+                        + MT2
+                        + examRecover(MT1, Clobber, 40)
+                        + examRecover(MT2, Clobber, 50);
+
+    console.log(totalNonFinal, MT1, Clobber, examRecover(MT1, Clobber, 50));
+
     const needed = [];
     const grades = [];
 
     for (const [bin, i] of BINS.map((val, index) => [val, index])) {
         const neededScore = Math.max(0, bin - totalNonFinal);
-        if (neededScore <= 100) {
+        if (neededScore <= 75) {
             needed.push(neededScore);
             grades.push(GRADES[i]);
         }
@@ -79,7 +96,14 @@ export function computeNeededFinalScore(scores) {
     return [grades, needed];
 }
 
+function examRecover(examScore, participation, maxExamScore, cap = 20) {
+    const halfScore = maxExamScore / 2;
+    const maxRecovery = Math.max(0, (halfScore - examScore) / 2);
+    const recoveryRatio = Math.min(participation, cap) / cap;
+    return maxRecovery * recoveryRatio;
+}
+
 export function participationProvided(scores) {
-    const { "Section Participation": Participation, Labs } = scores;
-    return !Number.isNaN(Participation + Labs);
+    const { "Section Participation (for clobber)": Participation } = scores;
+    return !Number.isNaN(Participation);
 }

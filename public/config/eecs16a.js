@@ -17,10 +17,16 @@ const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D
 export const COURSE_CODE = "16A";
 
 export const WARNING = `Please note that these scores are tentative and serve only as a rough guideline for your performance in the class. Grades listed here do not guarantee that assignment grade or final grade; we reserve the right to change these grades in the event of any mitigating circumstances (e.g., cheating, another violation of course policy, etc.) or errors in grading.
+<p>
 We will also be auditing these grades throughout the course of the semester - the Status Check is in an Alpha version and there will likely be many issues with the grades displayed. <b>Do not count on these grades as fully accurate - again, this is intended to serve as a rough guideline for how you're doing in the class. If you spot a possible issue with any of your grades, please let us know using this form (do NOT email):</b> <a href="https://forms.gle/m7GEAFfnrM1ErckH7">https://forms.gle/m7GEAFfnrM1ErckH7</a>`;
 
-export const EXPLANATION = String.raw`Each homework score is calculated like so: [Final (Scaled) Homework X Score] = max[([Raw Self-Grade (HW X)]*[Average Reader Adjustment Factor] + [Resubmission Points Gained (HW X)])*(10/8), 10]
-where the [Average Reader Adjustment Factor] is just the average of the ratio ([Reader Grades for Selected Problems (HW X)]/[Raw Self-Grade for Selected Problems (HW X)]) for each homework.`;
+export const EXPLANATION = String.raw`
+Each homework score is calculated like so:
+$$
+   \textrm{Final (Scaled) Homework X Score} = max[(\textrm{Raw Self-Grade (HW X)}*\textrm{Average Reader Adjustment Factor} + \textrm{Resubmission Points Gained (HW X)})*\frac{10}{8}, 10]
+$$
+<p>
+where the $\textrm{Average Reader Adjustment Factor}$ is just the average of the ratio $\frac{\textrm{Reader Grades for Selected Problems (HW X)}}{\textrm{Raw Self-Grade for Selected Problems (HW X)}}$ for each homework.`
 
 export const ENABLE_PLANNING = false;
 
@@ -77,6 +83,7 @@ export function createAssignments() {
                 Topic("Raw Homework Scores", [
                     ...range(15).map(i => LockedChildren(Topic(`Final (Scaled) Homework ${i} Score`, [
                         Assignment(`Raw Self-Grade (HW ${i})`, 10),
+                        Assignment(`Adjusted Self-Grade (HW ${i})`, 10),
                         OnlyDefault(Always(Hidden(Assignment("Average Reader Adjustment Factor")))),
                         BooleanValued(Assignment(`Resubmitted? (HW ${i})`, 1)),
                         Assignment(`Resubmission Point Gain (HW ${i})`, 10),

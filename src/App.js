@@ -8,12 +8,15 @@ import $ from "jquery";
 import StudentView from "./StudentView.js";
 import StaffView from "./StaffView.js";
 import ExplanationModal from "./ExplanationModal.js";
+import LoginButton from "./LoginButton.js";
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
             isStaff: false,
+            students: [],
+            success: false,
             data: null,
         };
         this.explanationModalRef = React.createRef();
@@ -25,26 +28,39 @@ class App extends Component {
 
     reloadData = async (target) => {
         const {
-            success, retry, header, data, isStaff,
+            success, retry, header, data, isStaff, allStudents,
         } = await $.get("./query/", { target });
         if (!success && retry) {
             this.refresh();
         }
 
+        if (isStaff) {
+            this.setState({
+                students: allStudents.map(({ Name, Email, SID }) => ({ text: `${Name} - ${Email} (${SID})`, id: Email })),
+            });
+        }
+
         this.setState({
-            data: { success, header, data },
+            success,
+            data: { header, data },
             isStaff,
         });
     };
 
+    refresh = () => {
+        window.location.replace("./login");
+    };
+
     handleExplanationClick = () => {
         $(this.explanationModalRef.current).modal();
-        console.log(this.explanationModalRef.current);
     };
 
     render() {
-        const contents = this.state.isStaff ? <StaffView handleSubmit={this.reloadData} />
-            : <StudentView {...this.state.data} />;
+        const contents = !this.state.success
+            ? <LoginButton onClick={this.refresh} />
+            : this.state.isStaff
+                ? <StaffView handleSubmit={this.reloadData} students={this.state.students} />
+                : <StudentView {...this.state.data} />;
 
         return (
             <>

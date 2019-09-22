@@ -90,14 +90,15 @@ def create_client(app):
                         return jsonify({
                             "success": True,
                             "isStaff": True,
+                            "allStudents": CACHED_ALL_STUDENTS,
                         })
 
-                    if email in CACHED_CSV:
-                        return jsonify({
-                            "success": True,
-                            "header": CSV_HEADER,
-                            "data": CACHED_CSV[email],
-                        })
+                if email in CACHED_CSV:
+                    return jsonify({
+                        "success": True,
+                        "header": CSV_HEADER,
+                        "data": CACHED_CSV[email],
+                    })
             else:
                 return jsonify({
                     "success": False,
@@ -157,6 +158,14 @@ with open(GRADES_PATH) as grades:
     CSV_HEADER = next(reader)
     for row in reader:
         CACHED_CSV[row[0]] = row
+
+CACHED_ALL_STUDENTS = []
+for email in CACHED_CSV:
+    student = {}
+    for i, header in enumerate(CSV_HEADER):
+        if header in ["SID", "Name", "Email"]:
+            student[header] = CACHED_CSV[email][i]
+    CACHED_ALL_STUDENTS.append(student)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000)
