@@ -3,6 +3,9 @@ import "./Row.css";
 import ScoreEntry from "./ScoreEntry.js";
 
 function formatScore(score, places = 2) {
+    if (Number.isNaN(parseFloat(score))) {
+        return score;
+    }
     return Number.parseFloat(score).toFixed(places);
 }
 

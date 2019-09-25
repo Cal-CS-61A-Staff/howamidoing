@@ -9,6 +9,8 @@ export const COURSE_CODE = "61A";
 
 export const WARNING = "The planning functionality for this tool is not yet active - do not rely on it! Also this tool hasn't been released to students, how did you get this link! :)";
 
+export const EXPLANATION = String.raw`what are grades anyway? [PLACEHOLDER]`;
+
 export const ENABLE_PLANNING = true;
 
 window.COURSE_CODE = COURSE_CODE;
@@ -17,6 +19,7 @@ window.canDisplayFinalGrades = canDisplayFinalGrades;
 window.computeNeededFinalScore = computeNeededFinalScore;
 window.participationProvided = participationProvided;
 window.WARNING = WARNING;
+window.EXPLANATION = EXPLANATION;
 window.ENABLE_PLANNING = ENABLE_PLANNING;
 
 export function createAssignments() {

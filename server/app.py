@@ -90,7 +90,9 @@ def create_client(app):
                         return jsonify({
                             "success": True,
                             "isStaff": True,
-                            "allStudents": CACHED_ALL_STUDENTS,
+                            "allStudents": list(CACHED_ALL_STUDENTS.values()),
+                            "email": ret.data['data']['email'],
+                            "name": ret.data['data']['name'],
                         })
 
                 if email in CACHED_CSV:
@@ -98,6 +100,9 @@ def create_client(app):
                         "success": True,
                         "header": CSV_HEADER,
                         "data": CACHED_CSV[email],
+                        "email": CACHED_ALL_STUDENTS[email]["Email"],
+                        "name": CACHED_ALL_STUDENTS[email]["Name"],
+                        "SID": CACHED_ALL_STUDENTS[email]["SID"],
                     })
             else:
                 return jsonify({
@@ -106,7 +111,6 @@ def create_client(app):
                 })
 
         except Exception as e:
-            print(e)
             pass
         return jsonify({
             "success": False,
@@ -116,7 +120,7 @@ def create_client(app):
     @app.route('/login/')
     def login():
         session.pop('dev_token', None)
-        return remote.authorize(callback=url_for('authorized', _external=True, _scheme='https'))
+        return remote.authorize(callback=url_for('authorized', _external=True))#, _scheme='https'))
 
     @app.route('/logout/')
     def logout():
@@ -159,13 +163,13 @@ with open(GRADES_PATH) as grades:
     for row in reader:
         CACHED_CSV[row[0]] = row
 
-CACHED_ALL_STUDENTS = []
+CACHED_ALL_STUDENTS = {}
 for email in CACHED_CSV:
     student = {}
     for i, header in enumerate(CSV_HEADER):
         if header in ["SID", "Name", "Email"]:
             student[header] = CACHED_CSV[email][i]
-    CACHED_ALL_STUDENTS.append(student)
+    CACHED_ALL_STUDENTS[email] = student
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000)

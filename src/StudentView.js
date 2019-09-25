@@ -45,6 +45,13 @@ function extend(scores) {
     return out;
 }
 
+function parse(score) {
+    if (Number.isNaN(parseFloat(score))) {
+        return score;
+    }
+    return Number.parseFloat(score);
+}
+
 class StudentView extends Component {
     constructor(props) {
         super(props);
@@ -112,7 +119,7 @@ class StudentView extends Component {
 
         if (!curr.isTopic) {
             totals[curr.name] = (scores[curr.name] !== undefined)
-                ? Number.parseFloat(scores[curr.name]) : NaN;
+                ? parse(scores[curr.name]) : NaN;
             return totals[curr.name];
         }
 

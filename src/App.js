@@ -15,6 +15,9 @@ class App extends Component {
         super(props);
         this.state = {
             isStaff: false,
+            email: null,
+            name: null,
+            SID: null,
             students: [],
             success: false,
             data: null,
@@ -28,7 +31,7 @@ class App extends Component {
 
     reloadData = async (target) => {
         const {
-            success, retry, header, data, isStaff, allStudents,
+            success, retry, header, data, isStaff, allStudents, email, name, SID,
         } = await $.get("./query/", { target });
         if (!success && retry) {
             this.refresh();
@@ -42,6 +45,9 @@ class App extends Component {
 
         this.setState({
             success,
+            email,
+            name,
+            SID,
             data: { header, data },
             isStaff,
         });
@@ -78,14 +84,22 @@ class App extends Component {
                         <div className="col-auto">
                             <br />
                             <p className="text-right">
-                                <a href="#" onClick={this.handleExplanationClick}>Explanation</a>
+                                Logged in as
+                                {" "}
+                                {this.state.name}
+                                {" ("}
+                                {this.state.email}
+                                {")."}
+                                <br />
+                                {this.state.SID && `SID: ${this.state.SID}`}
+                                {this.state.SID && <br />}
+                                <a href="#" onClick={this.handleExplanationClick}>Grade Explanation</a>
                             </p>
                         </div>
                     </div>
                     {" "}
                     <div className="row">
                         <div className="col">
-
                             {contents}
                         </div>
                     </div>
