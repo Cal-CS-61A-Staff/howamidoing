@@ -120,7 +120,7 @@ def create_client(app):
     @app.route('/login/')
     def login():
         session.pop('dev_token', None)
-        return remote.authorize(callback=url_for('authorized', _external=True))#, _scheme='https'))
+        return remote.authorize(callback=url_for('authorized', _external=True, _scheme='https'))
 
     @app.route('/logout/')
     def logout():

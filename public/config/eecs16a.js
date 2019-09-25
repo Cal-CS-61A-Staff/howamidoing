@@ -27,7 +27,13 @@ $$
    \textrm{Final (Scaled) Homework X Score} = max[(\textrm{Raw Self-Grade (HW X)}* \\ \textrm{Average Reader Adjustment Factor} + \textrm{Resubmission Points Gained (HW X)})*\frac{10}{8}, 10]
 $$
 <p>
-where the $\textrm{Average Reader Adjustment Factor}$ is just the average of the ratio $\frac{\textrm{Reader Grades for Selected Problems (HW X)}}{\textrm{Raw Self-Grade for Selected Problems (HW X)}}$ for each homework.`;
+where the $\textrm{Average Reader Adjustment Factor}$ is just the average of the ratio $\frac{\textrm{Reader Grades for Selected Problems (HW X)}}{\textrm{Raw Self-Grade for Selected Problems (HW X)}}$ across all homeworks.
+<p>
+In the event that your self-grades were turned in late, they are still used to compute the Average Reader Adjustment Factor. However, the formula to to compute your homework score becomes
+$$
+  \textrm{Final (Scaled) Homework X Score} = max[(\textrm{Raw Self-Grade (HW X)} * \\ \textrm{Average Reader Adjustment Factor} * 0.65 + \textrm{Resubmission Points Gained (HW X)})*\frac{10}{8}, 10]
+$$
+`;
 
 export const ENABLE_PLANNING = false;
 
@@ -84,11 +90,11 @@ export function createAssignments() {
                 Topic("Homework Scores", [
                     ...range(15).map(i => LockedChildren(Topic(`Final (Scaled) Homework ${i} Score`, [
                         Assignment(`Raw Self-Grade (HW ${i})`, 10),
-                        Assignment(`Adjusted Self-Grade (HW ${i})`, 10),
                         OnlyDefault(Always(Hidden(Assignment("Average Reader Adjustment Factor")))),
+                        Assignment(`Special Condition (HW ${i})`),
+                        Assignment(`Adjusted Self-Grade (HW ${i})`, 10),
                         BooleanValued(Assignment(`Resubmitted? (HW ${i})`, 1)),
                         Assignment(`Resubmission Point Gain (HW ${i})`, 10),
-                        Assignment(`Special Condition (HW ${i})`),
                     ], 10, hwCalculator))),
                 ]),
                 OnlyDefault(Always(Topic("Average Reader Adjustment Factor", [
