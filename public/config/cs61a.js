@@ -7,9 +7,13 @@ const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D
 
 export const COURSE_CODE = "61A";
 
-export const WARNING = "The planning functionality for this tool is not yet active - do not rely on it! Also this tool hasn't been released to students, how did you get this link! :)";
+export const WARNING = `Please note that these scores are tentative and serve only as a rough guideline for your performance in the class. Grades listed here do not guarantee that assignment grade or final grade; we reserve the right to change these grades in the event of any mitigating circumstances (e.g., cheating, another violation of course policy, etc.) or errors in grading.
+<br />
+We will also be auditing these grades throughout the course of the semester - the Status Check is in a Beta version and there will likely be many issues with the grades displayed. <b>Do not count on these grades as fully accurate - again, this is intended to serve as a rough guideline for how you're doing in the class. If you spot a possible issue with any of your grades OR any bugs with the Status Check, please let us know using by emailing us at: <a href="mailto:cs61a+fa19@berkeley.edu">cs61a+fa19@berkeley.edu</a></b>`;
 
-export const EXPLANATION = String.raw`what are grades anyway? [PLACEHOLDER]`;
+
+export const EXPLANATION = String.raw`https://cs61a.org/articles/about.html#grading`;
+export const EXPLANATION_IS_LINK = true;
 
 export const ENABLE_PLANNING = true;
 
@@ -21,13 +25,14 @@ window.participationProvided = participationProvided;
 window.WARNING = WARNING;
 window.EXPLANATION = EXPLANATION;
 window.ENABLE_PLANNING = ENABLE_PLANNING;
+window.EXPLANATION_IS_LINK = true;
 
 export function createAssignments() {
     return [
         Topic("Raw Score", [
             Topic("Exams", [
-                Assignment("Midterm 1", 40),
-                Assignment("Midterm 2", 50),
+                Assignment("Midterm 1 (Total)", 40),
+                Assignment("Midterm 2 (Total)", 50),
                 Assignment("Final", 75),
             ]),
             Topic("Homework", [
@@ -38,10 +43,11 @@ export function createAssignments() {
                 Topic("Hog Project", [
                     Assignment("Hog (Total)", 23),
                     Assignment("Hog Checkpoint (Total)", 1),
+                    Assignment("Hog (Composition)", 2),
                 ]),
-                Assignment("Typing Test", 25),
-                Assignment("Ants", 25),
-                Assignment("Scheme", 25),
+                Assignment("Cats", 21),
+                Assignment("Ants", 33),
+                Assignment("Scheme", 27),
             ]),
             Topic("Section Participation", [
                 ...range(1, 13).map(i => Assignment(`Discussion ${i} (Total)`, 1)),
@@ -57,14 +63,14 @@ export function createAssignments() {
 
 export function canDisplayFinalGrades(scores) {
     const {
-        Homework, Projects, "Midterm 1": MT1, "Midterm 2": MT2, "Section Participation": Participation,
+        Homework, Projects, "Midterm 1 (Total)": MT1, "Midterm 2 (Total)": MT2, "Section Participation": Participation,
     } = scores;
     return !Number.isNaN(Homework + Projects + Participation + MT1 + MT2);
 }
 
 export function computeNeededFinalScore(scores) {
     const {
-        Homework, Projects, "Midterm 1": MT1, "Midterm 2": MT2, "Section Participation": Participation,
+        Homework, Projects, "Midterm 1 (Total)": MT1, "Midterm 2 (Total)": MT2, "Section Participation": Participation,
     } = scores;
 
     let { "Section Participation (for clobber)": Clobber } = scores;
@@ -80,15 +86,13 @@ export function computeNeededFinalScore(scores) {
                         + examRecover(MT1, Clobber, 40)
                         + examRecover(MT2, Clobber, 50);
 
-    console.log(totalNonFinal, MT1, Clobber, examRecover(MT1, Clobber, 50));
-
     const needed = [];
     const grades = [];
 
     for (const [bin, i] of BINS.map((val, index) => [val, index])) {
         const neededScore = Math.max(0, bin - totalNonFinal);
         if (neededScore <= 75) {
-            needed.push(neededScore);
+            needed.push(`${neededScore} / 75`);
             grades.push(GRADES[i]);
         }
         if (neededScore === 0) {

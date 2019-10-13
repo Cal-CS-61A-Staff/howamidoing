@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="57c9dbba-d304-4263-8250-a01f64696634" name="Default Changelist" comment="Implemented support for multiple course grading logic.">
+    <list default="true" id="57c9dbba-d304-4263-8250-a01f64696634" name="Default Changelist" comment="More 16A changes">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/Procfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/FileDropTarget.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/FileDropTarget.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/StudentTargetSelector.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UploadStatusModal.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UploadTargets.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UploadTargets.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/config/ee16a.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/config/ee16a.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/config/elements.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/config/elements.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/config/courseList.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/config/courseList.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/config/cs61a.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/config/cs61a.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/.dockerignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Row.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Row.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Topic.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Topic.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ExplanationModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/ExplanationModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/StaffView.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/StaffView.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,12 +37,26 @@
     <SUITE FILE_PATH="coverage/61a_grades$app__1_.coverage" NAME="app (1) Coverage Results" MODIFIED="1563963658240" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/build" />
     <SUITE FILE_PATH="coverage/61a_grades$__main__.coverage" NAME="__main__ Coverage Results" MODIFIED="1567012438944" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/server" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="CSS File" />
-        <option value="JavaScript File" />
         <option value="Python Script" />
+        <option value="JavaScript File" />
+        <option value="CSS File" />
       </list>
     </option>
   </component>
@@ -38,13 +66,15 @@
   <component name="ProjectId" id="1Qp8xXStZWjRedC9MYOqYQ8sZ2n" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="mysql" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
     <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
     <property name="WebServerToolWindowPanel.toolwindow.highlight.symlinks" value="true" />
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/deploy" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.standard" value="true" />
@@ -58,15 +88,15 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/deploy" />
+      <recent name="$PROJECT_DIR$/src" />
       <recent name="$PROJECT_DIR$/server" />
+      <recent name="$PROJECT_DIR$/deploy" />
       <recent name="$PROJECT_DIR$/public/config" />
       <recent name="$PROJECT_DIR$/deploy/static" />
-      <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/server" />
@@ -192,6 +222,16 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="ServiceViewManager">
+    <option name="allServicesViewState">
+      <serviceView>
+        <treeState>
+          <expand />
+          <select />
+        </treeState>
+      </serviceView>
+    </option>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -227,7 +267,21 @@
       <workItem from="1568593999353" duration="13815000" />
       <workItem from="1568637521988" duration="1102000" />
       <workItem from="1568671870910" duration="996000" />
-      <workItem from="1568713110383" duration="15971000" />
+      <workItem from="1568713110383" duration="21447000" />
+      <workItem from="1568859607978" duration="1423000" />
+      <workItem from="1568878655547" duration="5973000" />
+      <workItem from="1568934497222" duration="14245000" />
+      <workItem from="1569111535077" duration="11972000" />
+      <workItem from="1569138872679" duration="2086000" />
+      <workItem from="1569301083802" duration="16947000" />
+      <workItem from="1569440951266" duration="1815000" />
+      <workItem from="1569460642052" duration="574000" />
+      <workItem from="1569579731344" duration="41000" />
+      <workItem from="1569723953079" duration="4560000" />
+      <workItem from="1570347462814" duration="1289000" />
+      <workItem from="1570486973481" duration="576000" />
+      <workItem from="1570698204655" duration="8729000" />
+      <workItem from="1570954091451" duration="8302000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1563622975086</created>
@@ -404,7 +458,49 @@
       <option name="project" value="LOCAL" />
       <updated>1568637940021</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Lots of 16A nonsense.">
+      <created>1568845365065</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1568845365065</updated>
+    </task>
+    <task id="LOCAL-00027" summary="More 16A-specific changes.">
+      <created>1568960336080</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1568960336080</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Added a way to display an explanation of grading logic.">
+      <created>1569065416650</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1569065416650</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Lots more changes.">
+      <created>1569135968025</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1569135968025</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Support non-float scores">
+      <created>1569387719826</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1569387719826</updated>
+    </task>
+    <task id="LOCAL-00031" summary="More 16A changes">
+      <created>1569395731335</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1569395731335</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -424,12 +520,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Initial commit" />
-    <MESSAGE value="Modified .gitignore" />
-    <MESSAGE value="Tweaks" />
-    <MESSAGE value="Added most of the front-end display." />
-    <MESSAGE value="Implemented final grade prediction." />
-    <MESSAGE value="Got it working." />
     <MESSAGE value="Prototype EE16A logic" />
     <MESSAGE value="Bugfixes" />
     <MESSAGE value="Deployed" />
@@ -449,10 +539,16 @@
     <MESSAGE value="Updated grading display logic" />
     <MESSAGE value="Implemented support for multiple course grading logic." />
     <MESSAGE value="Got a deployment for 61A working." />
-    <option name="LAST_COMMIT_MESSAGE" value="Got a deployment for 61A working." />
+    <MESSAGE value="Lots of 16A nonsense." />
+    <MESSAGE value="More 16A-specific changes." />
+    <MESSAGE value="Added a way to display an explanation of grading logic." />
+    <MESSAGE value="Lots more changes." />
+    <MESSAGE value="Support non-float scores" />
+    <MESSAGE value="More 16A changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="More 16A changes" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/61a_grades$app.coverage" NAME="app Coverage Results" MODIFIED="1568787319353" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/server" />
-    <SUITE FILE_PATH="coverage/61a_grades$app__2_.coverage" NAME="app (2) Coverage Results" MODIFIED="1568598552080" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deploy" />
+    <SUITE FILE_PATH="coverage/61a_grades$app.coverage" NAME="app Coverage Results" MODIFIED="1570963007671" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/server" />
+    <SUITE FILE_PATH="coverage/61a_grades$app__2_.coverage" NAME="app (2) Coverage Results" MODIFIED="1570953007071" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/deploy" />
   </component>
 </project>

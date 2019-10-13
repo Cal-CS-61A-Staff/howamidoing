@@ -14,7 +14,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "16a-deploy": "cd deploy && mv 16a-grades.csv grades.csv && rm 61a-grades.csv && gcloud builds submit --tag gcr.io/banded-syntax-252420/16a-grades && gcloud beta run deploy statuscheck --image gcr.io/banded-syntax-252420/16a-grades --platform managed --region us-east1",
-    "61a-deploy": "cd deploy && mv 61a-grades.csv grades.csv && rm 16a-grades.csv && rm -rf .git && git init && git add -A && git commit -m \"init\" && git remote add dokku dokku@apps.cs61a.org:howamidoing && git push --force dokku master"
+    "61a-deploy": "cd deploy && rm -rf .git && git init && git add -A && git commit -m \"init\" && git remote add dokku dokku@apps.cs61a.org:howamidoing && git push --force dokku master"
   },
   "browserslist": {
     "production": [

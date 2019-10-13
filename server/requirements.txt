@@ -3,3 +3,5 @@ flask
 requests
 flask_oauthlib
 gunicorn
+SQLAlchemy
+mysqlclient

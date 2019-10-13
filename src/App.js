@@ -58,14 +58,18 @@ class App extends Component {
     };
 
     handleExplanationClick = () => {
-        $(this.explanationModalRef.current).modal();
+        if (window.EXPLANATION_IS_LINK) {
+            window.open(window.EXPLANATION, "__blank");
+        } else {
+            $(this.explanationModalRef.current).modal();
+        }
     };
 
     render() {
         const contents = !this.state.success
             ? <LoginButton onClick={this.refresh} />
             : this.state.isStaff
-                ? <StaffView handleSubmit={this.reloadData} students={this.state.students} />
+                ? <StaffView onSubmit={this.reloadData} students={this.state.students} />
                 : <StudentView {...this.state.data} />;
 
         return (
