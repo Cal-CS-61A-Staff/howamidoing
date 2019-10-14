@@ -131,6 +131,10 @@ def create_client(app):
     def index():
         return render_template("index.html", courseCode=get_course_code())
 
+    @app.route("/redirect")
+    def ohlord():
+        return redirect("https://howamidoing.cs61a.org")
+
     @app.route("/config/config.js")
     def config():
         with connect_db() as db:
