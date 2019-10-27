@@ -45,7 +45,7 @@ export function createAssignments() {
                     Assignment("Hog Checkpoint (Total)", 1),
                     Assignment("Hog (Composition)", 2),
                 ]),
-                Assignment("Cats", 21),
+                Assignment("Cats", 18),
                 Assignment("Ants", 33),
                 Assignment("Scheme", 27),
             ]),

@@ -8,6 +8,7 @@ import "./StudentView.css";
 import GradeTable from "./GradeTable.js";
 import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
+import computeTotals from "./computeTotals.js";
 
 let ASSIGNMENTS = [];
 
@@ -43,13 +44,6 @@ function extend(scores) {
         }
     }
     return out;
-}
-
-function parse(score) {
-    if (Number.isNaN(parseFloat(score))) {
-        return score;
-    }
-    return Number.parseFloat(score);
 }
 
 class StudentView extends Component {
@@ -103,65 +97,7 @@ class StudentView extends Component {
         this.forceUpdate();
     };
 
-    computeTotals(curr, scores, totals) {
-        if (totals[curr.name]) { // TODO: remove this kludge
-            return totals[curr.name];
-        }
-
-        if (curr.future && !this.state.future) {
-            return NaN;
-        }
-
-        // if (curr.default && this.state.future) {
-        //     totals[curr.name] = NaN;
-        //     return NaN;
-        // }
-
-        if (!curr.isTopic) {
-            totals[curr.name] = (scores[curr.name] !== undefined)
-                ? parse(scores[curr.name]) : NaN;
-            return totals[curr.name];
-        }
-
-        const childTotals = [];
-
-        let out = 0;
-        for (const child of curr.children.slice().reverse()) {
-            if (child.future && !this.state.future) {
-                continue;
-            }
-            const childTotal = this.computeTotals(child, scores, totals);
-            out += childTotal;
-            childTotals.push(childTotal);
-        }
-
-        childTotals.reverse();
-
-        if (curr.customCalculator) {
-            out = curr.customCalculator(childTotals, this.state.future);
-        }
-
-        const limit = this.state.future ? curr.futureMaxScore : curr.maxScore;
-
-        if (limit) {
-            out = Math.min(out, limit);
-        }
-
-        totals[curr.name] = out;
-
-        if (scores[curr.name] !== undefined
-            && !Number.isNaN(Number.parseFloat(scores[curr.name]))) {
-            totals[curr.name] = Number.parseFloat(scores[curr.name]);
-            return totals[curr.name];
-        }
-
-        return out;
-    }
-
     render() {
-        const totals = {};
-        const plannedTotals = {};
-
         const scores = extend(this.state.scores);
 
         if (this.state.future) {
@@ -172,10 +108,10 @@ class StudentView extends Component {
             }
         }
 
-        for (const assignment of ASSIGNMENTS) {
-            this.computeTotals(assignment, scores, totals);
-            this.computeTotals(assignment, this.state.plannedScores, plannedTotals);
-        }
+        const totals = computeTotals(ASSIGNMENTS, scores, this.state.future);
+        const plannedTotals = computeTotals(
+            ASSIGNMENTS, this.state.plannedScores, this.state.future,
+        );
 
         const warning = window.WARNING
             // eslint-disable-next-line react/no-danger

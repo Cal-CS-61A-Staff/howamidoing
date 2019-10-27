@@ -13,8 +13,7 @@
     "build": "yarn run react-scripts build && rm -rf deploy && mkdir deploy && cp -a server/. deploy/ && mv build deploy/static",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "16a-deploy": "cd deploy && mv 16a-grades.csv grades.csv && rm 61a-grades.csv && gcloud builds submit --tag gcr.io/banded-syntax-252420/16a-grades && gcloud beta run deploy statuscheck --image gcr.io/banded-syntax-252420/16a-grades --platform managed --region us-east1",
-    "61a-deploy": "cd deploy && rm -rf .git && git init && git add -A && git commit -m \"init\" && git remote add dokku dokku@apps.cs61a.org:howamidoing && git push --force dokku master"
+    "deploy": "cd deploy && rm -rf .git && git init && git add -A && git commit -m \"init\" && git remote add dokku dokku@apps.cs61a.org:howamidoing && git push --force dokku master"
   },
   "browserslist": {
     "production": [
@@ -29,6 +28,7 @@
     ]
   },
   "devDependencies": {
+    "@data-ui/histogram": "^0.0.81",
     "bootstrap": "^4.3.1",
     "eslint-config-airbnb": "^17.1.1",
     "jquery": "^3.4.1",

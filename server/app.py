@@ -85,7 +85,8 @@ def get_course_code():
 
 
 def is_staff(remote):
-    ret = remote.get("user", token=session["dev_token"])
+    token = session.get("dev_token") or request.cookies.get("dev_token")
+    ret = remote.get("user", token=token)
     for course in ret.data["data"]["participations"]:
         if course["role"] not in AUTHORIZED_ROLES:
             continue
@@ -129,6 +130,10 @@ def create_client(app):
 
     @app.route("/")
     def index():
+        return render_template("index.html", courseCode=get_course_code())
+
+    @app.route("/labhistogram")
+    def labhistogram():
         return render_template("index.html", courseCode=get_course_code())
 
     @app.route("/redirect")
@@ -202,6 +207,20 @@ def create_client(app):
         except Exception as e:
             pass
         return jsonify({"success": False, "retry": False})
+
+    @app.route("/allScores", methods=["POST"])
+    def all_scores():
+        if not is_staff(remote):
+            return jsonify({"success": False})
+        with connect_db() as db:
+            [header] = db("SELECT header FROM headers WHERE courseCode=%s", [get_course_code()]).fetchone()
+            header = json.loads(header)
+            data = db("SELECT data FROM students WHERE courseCode=%s", get_course_code()).fetchall()
+            scores = []
+            for [score] in data:
+                score = json.loads(score)
+                scores.append(score)
+            return jsonify({"header": header, "scores": scores})
 
     @app.route("/setConfig", methods=["POST"])
     def set_config():

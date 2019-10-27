@@ -82,10 +82,10 @@ export function createAssignments() {
     return [
         Topic("Raw Score", [
             Topic("Exams", [
-                Assignment("Midterm 1", 50),
+                Assignment("Midterm 1", 100),
                 Assignment("Midterm 2", 50),
                 Assignment("Final", 100),
-            ]),
+            ], Infinity, ([mt1]) => mt1 / 2),
             Topic("Homework", [
                 Topic("Homework Scores", [
                     ...range(15).map(i => LockedChildren(Topic(`Final (Scaled) Homework ${i} Score`, [
@@ -106,7 +106,7 @@ export function createAssignments() {
                 ], null))),
             ], 35, ([raw]) => raw / 150 * 35),
             Topic("Labs", [
-                ...["Imaging 1", "Imaging 2", "Imaging 3", "Touch 1", "Touch 2", "Touch 3A", "Touch 3B", "APS 1", "APS 2"].map(
+                ...["Imaging 1", "Imaging 2", "Imaging 3", "Touchscreen 1", "Touchscreen 2", "Touchscreen 3A", "Touchscreen 3B", "APS 1", "APS 2"].map(
                     title => BooleanValued(Assignment(`${title}`, 1)),
                 ),
             ], 45, labCalculator),
@@ -114,7 +114,7 @@ export function createAssignments() {
                 range(1, 16)
                     .flatMap(
                         i => ["A", "B"].map(
-                            (letter, offset) => BooleanValued(Assignment(`Discussion ${i}${letter} (${getDiscDate(i, offset)})`, 1.25)),
+                            (letter, offset) => BooleanValued(Assignment(`Discussion ${i}${letter} (${getDiscDate(i, offset)})`, 1.33)),
                         ),
                     )
                     .filter(
