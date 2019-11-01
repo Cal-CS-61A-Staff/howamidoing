@@ -79,9 +79,21 @@ def get_course_code():
         with open("static/config/courseList.json") as config:
             data = json.load(config)
             host = request.headers["Host"]
-            return data.get(host, host)
+            for code, info in data.items():
+                if host in info["domains"]:
+                    return code
+            return "cs61a"
     except FileNotFoundError:
         return "cs61a"
+
+
+def get_course():
+    try:
+        with open("static/config/courseList.json") as config:
+            data = json.load(config)
+            return data[get_course_code()]
+    except FileNotFoundError:
+        return {}
 
 
 def is_staff(remote):
@@ -90,10 +102,7 @@ def is_staff(remote):
     for course in ret.data["data"]["participations"]:
         if course["role"] not in AUTHORIZED_ROLES:
             continue
-        if (
-            course["course"]["display_name"].lower().replace(" ", "")
-            != get_course_code()
-        ):
+        if course["course"]["offering"] != get_course()["endpoint"]:
             continue
         return True
     return False

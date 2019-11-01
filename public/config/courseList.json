@@ -1,5 +1,10 @@
 {
-    "status.eecs16a.org": "eecs16a",
-    "howamidoing.cs61a.org": "cs61a",
-    "pleaseohlordineedtopassthisclasshowamidoing.cs61a.org": "cs61a"
+    "cs61a": {
+        "domains": ["howamidoing.cs61a.org", "pleaseohlordineedtopassthisclasshowamidoing.cs61a.org"],
+        "endpoint": "cal/cs61a/fa19"
+    },
+    "eecs16a": {
+        "domains": ["status.eecs16a.org"],
+        "endpoint": "cal/eecs16a/fa19"
+    }
 }
