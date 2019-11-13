@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import csv
@@ -72,6 +73,11 @@ with connect_db() as db:
        courseCode varchar(128),
        header BLOB)"""
     )
+    db(
+        """CREATE TABLE IF NOT EXISTS lastUpdated (
+       courseCode varchar(128),
+       lastUpdated TIMESTAMP)"""
+    )
 
 
 def get_course_code():
@@ -93,7 +99,21 @@ def get_course():
             data = json.load(config)
             return data[get_course_code()]
     except FileNotFoundError:
-        return {}
+        return {
+            "domains": ["localhost"],
+            "endpoint": "cal/cs61a/fa19"
+        }
+
+
+def last_updated():
+    try:
+        with connect_db() as db:
+            return db(
+                "SELECT lastUpdated from lastUpdated where courseCode=%s",
+                [get_course_code()],
+            ).fetchone()[0]
+    except:
+        return "Unknown"
 
 
 def is_staff(remote):
@@ -188,6 +208,7 @@ def create_client(app):
                                 "allStudents": all_students,
                                 "email": ret.data["data"]["email"],
                                 "name": ret.data["data"]["name"],
+                                "lastUpdated": last_updated(),
                             }
                         )
 
@@ -196,7 +217,10 @@ def create_client(app):
                         "SELECT shortData, data FROM students WHERE courseCode=%s AND email=%s",
                         [get_course_code(), email],
                     ).fetchone()
-                    [header] = db("SELECT header FROM headers WHERE courseCode=%s", [get_course_code()]).fetchone()
+                    [header] = db(
+                        "SELECT header FROM headers WHERE courseCode=%s",
+                        [get_course_code()],
+                    ).fetchone()
                     short_data = json.loads(short_data)
                     data = json.loads(data)
                     header = json.loads(header)
@@ -208,6 +232,7 @@ def create_client(app):
                             "email": short_data["Email"],
                             "name": short_data["Name"],
                             "SID": short_data["SID"],
+                            "lastUpdated": last_updated(),
                         }
                     )
             else:
@@ -222,9 +247,13 @@ def create_client(app):
         if not is_staff(remote):
             return jsonify({"success": False})
         with connect_db() as db:
-            [header] = db("SELECT header FROM headers WHERE courseCode=%s", [get_course_code()]).fetchone()
+            [header] = db(
+                "SELECT header FROM headers WHERE courseCode=%s", [get_course_code()]
+            ).fetchone()
             header = json.loads(header)
-            data = db("SELECT data FROM students WHERE courseCode=%s", get_course_code()).fetchall()
+            data = db(
+                "SELECT data FROM students WHERE courseCode=%s", get_course_code()
+            ).fetchall()
             scores = []
             for [score] in data:
                 score = json.loads(score)
@@ -265,6 +294,11 @@ def create_client(app):
                         json.dumps(row),
                     ],
                 )
+            db("DELETE FROM lastUpdated WHERE courseCode=%s", [course_code])
+            db(
+                "INSERT INTO lastUpdated VALUES (%s, %s)",
+                [course_code, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
+            )
 
         return jsonify({"success": True})
 

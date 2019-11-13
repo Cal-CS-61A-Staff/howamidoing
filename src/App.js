@@ -10,6 +10,8 @@ import StaffView from "./StaffView.js";
 import ExplanationModal from "./ExplanationModal.js";
 import LoginButton from "./LoginButton.js";
 
+import "./App.css";
+
 class App extends Component {
     constructor(props) {
         super(props);
@@ -21,6 +23,7 @@ class App extends Component {
             students: [],
             success: false,
             data: null,
+            lastUpdated: "Unknown",
         };
         this.explanationModalRef = React.createRef();
     }
@@ -31,7 +34,7 @@ class App extends Component {
 
     reloadData = async (target) => {
         const {
-            success, retry, header, data, isStaff, allStudents, email, name, SID,
+            success, retry, header, data, isStaff, allStudents, email, name, SID, lastUpdated,
         } = await $.get("./query/", { target });
         if (!success && retry) {
             this.refresh();
@@ -48,6 +51,7 @@ class App extends Component {
             email,
             name,
             SID,
+            lastUpdated,
             data: { header, data },
             isStaff,
         });
@@ -108,6 +112,16 @@ class App extends Component {
                         </div>
                     </div>
                 </div>
+                <footer className="footer mt-auto py-3">
+                    <div className="container">
+                        <span className="text-muted">
+                            Last updated:
+                            {" "}
+                            {this.state.lastUpdated}
+                        </span>
+                    </div>
+                </footer>
+
                 <ExplanationModal ref={this.explanationModalRef} />
             </>
         );

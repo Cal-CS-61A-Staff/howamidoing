@@ -25,17 +25,17 @@ export default function AssignmentDetails({ onLogin }) {
 
     const labs = [
         "Imaging 1", "Imaging 2", "Imaging 3", "Touchscreen 1", "Touchscreen 2",
-        "Touchscreen 3A"];
+        "Touchscreen 3A", "Touchscreen 3B", "APS 1", "APS 2"];
 
     const assignmentScores = useMemo(() => (data.map(
         student => labs
-            .map(lab => student[lab])
+            .map(lab => student[lab] || 0)
             .map(x => Number.parseInt(x, 10))
             .reduce((x, y) => x + y),
-    )), [data]);
+    )), [data, labs]);
 
 
-    const bins = [0, 1, 2, 3, 4, 5];
+    const bins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     const [toggled, setToggled] = useState(bins.map(() => false));
 
