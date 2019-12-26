@@ -50,7 +50,7 @@ export default function AssignmentDetails({ onLogin }) {
         }))
         .filter(({ Score }) => toggled[Score]);
 
-    return (
+    const contents = (
         <>
             <div style={{ height: "40vh" }}>
                 <ResponsiveHistogram
@@ -65,7 +65,7 @@ export default function AssignmentDetails({ onLogin }) {
                             <strong style={{ color }}>
                                 {datum.bin0}
                                 {" "}
-                            to
+                                to
                                 {" "}
                                 {datum.bin1}
                             </strong>
@@ -96,4 +96,6 @@ export default function AssignmentDetails({ onLogin }) {
             <StudentTable students={students} onLogin={onLogin} />
         </>
     );
+
+    return data.length ? contents : <div>Loading...</div>;
 }

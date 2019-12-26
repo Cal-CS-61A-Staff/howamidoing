@@ -6,5 +6,9 @@
     "eecs16a": {
         "domains": ["status.eecs16a.org"],
         "endpoint": "cal/eecs16a/fa19"
+    },
+    "eecs16b": {
+      "domains": ["status.eecs16b.org"],
+      "endpoint": "cal/eecs16b/sp20"
     }
 }

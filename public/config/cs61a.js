@@ -36,7 +36,9 @@ export function createAssignments() {
                 Assignment("Final", 75),
             ]),
             Topic("Homework", [
-                ...range(11).map(i => Assignment(`Homework ${i} (Total)`, 2)),
+                ...range(1, 4).map(i => Assignment(`Homework ${i} (Total)`, 2)),
+                Assignment("Homework 4 (Total)", 4),
+                ...range(5, 11).map(i => Assignment(`Homework ${i} (Total)`, 2)),
                 Assignment("Homework 11 (Total)", 3),
             ]),
             Topic("Projects", [
@@ -45,16 +47,28 @@ export function createAssignments() {
                     Assignment("Hog Checkpoint (Total)", 1),
                     Assignment("Hog (Composition)", 2),
                 ]),
-                Assignment("Cats", 18),
-                Assignment("Ants", 33),
-                Assignment("Scheme", 27),
+                Topic("Cats Project", [
+                    Assignment("Cats (Total)", 18),
+                    Assignment("Cats Checkpoint (Total)", 1),
+                    Assignment("Cats (Composition)", 2),
+                ]),
+                Topic("Ants Project", [
+                    Assignment("Ants (Total)", 30),
+                    Assignment("Ants Checkpoint (Total)", 1),
+                    Assignment("Ants (Composition)", 2),
+                ]),
+                Assignment("Scheme (Challenge ver.) (Total)", 29),
+                Topic("Scheme Project", [
+                    Assignment("Scheme (Total)", 28),
+                    Assignment("Scheme Checkpoint (Total)", 1),
+                ]),
             ]),
             Topic("Section Participation", [
                 ...range(1, 13).map(i => Assignment(`Discussion ${i} (Total)`, 1)),
                 ...range(1, 13).map(i => Assignment(`Lab ${i} (Total)`, 1)),
             ], 10),
         ]),
-        Topic("Section Participation (for clobber)", [
+        Topic("Participation Credits (for midterm recovery)", [
             ...range(1, 13).map(i => Assignment(`Discussion ${i} (Total)`, 1)),
             ...range(1, 13).map(i => Assignment(`Lab ${i} (Total)`, 1)),
         ], 20),
@@ -73,7 +87,7 @@ export function computeNeededFinalScore(scores) {
         Homework, Projects, "Midterm 1 (Total)": MT1, "Midterm 2 (Total)": MT2, "Section Participation": Participation,
     } = scores;
 
-    let { "Section Participation (for clobber)": Clobber } = scores;
+    let { "Participation Credits (for midterm recovery)": Clobber } = scores;
     if (!Clobber) {
         Clobber = 0;
     }
@@ -111,6 +125,6 @@ function examRecover(examScore, participation, maxExamScore, cap = 20) {
 }
 
 export function participationProvided(scores) {
-    const { "Section Participation (for clobber)": Participation } = scores;
+    const { "Participation Credits (for midterm recovery)": Participation } = scores;
     return !Number.isNaN(Participation);
 }
