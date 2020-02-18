@@ -1,5 +1,7 @@
 # EECS Grade Display Tool
 
-To use, run `yarn build` and run `python3 deploy/app.py`.
+This is a tool meant to display and forecast grades for lower-div EECS classes at UC Berkeley. To deploy, run `yarn build && yarn deploy`.
 
-This is a tool meant to display and forecast grades for lower-div EECS classes at UC Berkeley.
+To develop, install the python dependencies in `server/requirements.txt`, run `yarn`, then run `yarn start`.
+
+To setup the database, run `mysql` and run the command `CREATE DATABASE statuscheck;`.

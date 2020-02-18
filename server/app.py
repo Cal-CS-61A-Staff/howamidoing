@@ -354,6 +354,11 @@ app = Flask(
     __name__, static_url_path="", static_folder="static", template_folder="static"
 )
 app.secret_key = SECRET
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
 create_client(app)
 
 if __name__ == "__main__":
