@@ -31,9 +31,13 @@ GRADES_PATH = os.path.join(BASE_DIR, "grades.csv")
 
 AUTHORIZED_ROLES = ["staff", "instructor"]
 
+dev_env = "gunicorn" not in os.environ.get("SERVER_SOFTWARE", "")
 
-if __name__ == "__main__":
-    engine = create_engine("mysql://localhost/statuscheck")
+if dev_env:
+    # for mysql, use "mysql://localhost/statuscheck"
+    engine = create_engine('sqlite:///' + os.path.join(BASE_DIR, 'app.db'))
+    SECRET = "kmSPJYPzKJglOOOmr7q0irMfBVMRFXN"
+    CONSUMER_KEY = "local-dev-all"
 else:
     engine = create_engine(os.getenv("DATABASE_URL"))
 
@@ -44,6 +48,8 @@ def connect_db():
 
         def db(*args):
             try:
+                if dev_env:
+                    args = (args[0].replace("%s", "?"), *args[1:])
                 if isinstance(args[1][0], str):
                     raise TypeError
             except (IndexError, TypeError):
@@ -117,6 +123,8 @@ def last_updated():
 
 
 def is_staff(remote):
+    if(dev_env):
+        return True
     token = session.get("dev_token") or request.cookies.get("dev_token")
     ret = remote.get("user", token=token)
     for course in ret.data["data"]["participations"]:
