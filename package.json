@@ -13,7 +13,8 @@
     "build": "yarn run react-scripts build && rm -rf deploy && mkdir deploy && cp -a server/. deploy/ && mv build deploy/static",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "cd deploy && rm -rf .git && git init && git add -A && git commit -m \"init\" && git remote add dokku dokku@apps.cs61a.org:howamidoing && git push --force dokku master"
+    "deploy": "cd deploy && rm -rf .git && git init && git add -A && git commit -m \"init\" && git remote add dokku dokku@apps.cs61a.org:howamidoing && git push --force dokku master",
+    "dev": "concurrently -n 'server, client' \"nodemon --exec python3 server/app.py\" \"yarn start\""
   },
   "browserslist": {
     "production": [
@@ -33,6 +34,7 @@
     "eslint-config-airbnb": "^17.1.1",
     "jquery": "^3.4.1",
     "katex": "^0.11.1",
+    "nodemon": "^2.0.2",
     "popper.js": "^1.15.0",
     "react-latex": "^1.4.0",
     "react-select2-wrapper": "^1.0.4-beta6",
