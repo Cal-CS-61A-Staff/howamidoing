@@ -6,12 +6,12 @@ To develop, install the python dependencies in `server/requirements.txt`, run `y
 
 To setup the database, run `mysql` and run the command `CREATE DATABASE statuscheck;`.
 
-# Environment Variables
-OAUTH_SECRET = secret key for oauth
+## Environment Variables
+`OAUTH_SECRET` = secret key for oauth
 
-DATABASE_URL = url for mysql db
+`DATABASE_URL` = url for mysql db
 
-# MYSQL Setup and Troubleshooting (Mac)
+## MYSQL Setup and Troubleshooting (Mac)
 
 Download community version from [here](https://dev.mysql.com/downloads/mysql/5.1.html)
 
