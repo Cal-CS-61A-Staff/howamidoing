@@ -22,8 +22,6 @@ from flask_oauthlib.client import OAuth
 import requests
 from sqlalchemy import create_engine
 
-from secrets import SECRET
-
 CONSUMER_KEY = "61a-grade-view"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,6 +37,7 @@ if dev_env:
     SECRET = "kmSPJYPzKJglOOOmr7q0irMfBVMRFXN"
     CONSUMER_KEY = "local-dev-all"
 else:
+    SECRET = os.getenv("OAUTH_SECRET")
     engine = create_engine(os.getenv("DATABASE_URL"))
 
 
