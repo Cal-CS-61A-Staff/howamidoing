@@ -2,7 +2,7 @@
 
 This is a tool meant to display and forecast grades for lower-div EECS classes at UC Berkeley. To deploy, run `yarn build && yarn deploy`.
 
-To develop, install the python dependencies in `server/requirements.txt`, run `yarn`, then run `yarn start`.
+To develop, install the python dependencies in `server/requirements.txt`, run `yarn`, then run `yarn dev`. `yarn dev` will concurrently run `python3 app.py` (backend) and `yarn start` (frontend).
 
 To setup the database, run `mysql` and run the command `CREATE DATABASE statuscheck;`.
 
