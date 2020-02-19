@@ -31,7 +31,6 @@ AUTHORIZED_ROLES = ["staff", "instructor"]
 
 dev_env = "gunicorn" not in os.environ.get("SERVER_SOFTWARE", "")
 
-
 @contextmanager
 def connect_db():
     with engine.connect() as conn:
@@ -339,6 +338,7 @@ app = Flask(
     __name__, static_url_path="", static_folder="static", template_folder="static"
 )
 app.secret_key = SECRET
+
 if not dev_env:
     app.config.update(
         SESSION_COOKIE_SECURE=True,
