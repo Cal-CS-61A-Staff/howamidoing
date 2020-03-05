@@ -4,7 +4,9 @@
   "private": true,
   "proxy": "http://localhost:8000",
   "dependencies": {
+    "concurrently": "^5.1.0",
     "react": "^16.8.6",
+    "react-bootstrap": "^1.0.0-beta.17",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
   },

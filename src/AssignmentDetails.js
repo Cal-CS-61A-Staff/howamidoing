@@ -5,6 +5,7 @@ import {
 import $ from "jquery";
 import BinSelectors from "./BinSelectors.js";
 import StudentTable from "./StudentTable.js";
+import Dropdown from 'react-bootstrap/Dropdown'
 
 const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest }) => (
     <Histogram
@@ -14,26 +15,41 @@ const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest
     />
 ));
 
+const extractAssignmentData = (arr, index) => {
+    return arr.map(scores => scores[index])
+}
+
 export default function AssignmentDetails({ onLogin }) {
     const [data, setData] = useState([]);
+    const [currentAssignment, setAssignment] = useState(0)
 
     useEffect(() => {
         $.post("/allScores").done(({ header, scores }) => {
             setData(scores.map(x => Object.fromEntries(x.map((v, i) => [header[i], v]))));
         });
     }, []);
-
-    const labs = [
-        "Imaging 1", "Imaging 2", "Imaging 3", "Touchscreen 1", "Touchscreen 2",
-        "Touchscreen 3A", "Touchscreen 3B", "APS 1", "APS 2"];
+    console.log("data", data)
+    const assignments = ["Homework 1", "Homework 2"];
+    const {createAssignments, setSchema} = window
+    setSchema([], [])
+    const ASSIGNMENTS = createAssignments()
+    for (const assignment of ASSIGNMENTS) {
+        console.log(assignment)
+    }
 
     const assignmentScores = useMemo(() => (data.map(
-        student => labs
-            .map(lab => student[lab] || 0)
+        student => assignments
+            .map(assignment => student[assignment] || 0)
             .map(x => Number.parseInt(x, 10))
-            .reduce((x, y) => x + y),
-    )), [data, labs]);
+    )), [data, assignments]);
+    console.log("asssn scores ", " hello?")
+    console.log(assignmentScores)
 
+    const totalScores = assignmentScores.map((assignments) =>
+        assignments.reduce((x, y) => x + y))
+
+    const assignment0Data = extractAssignmentData(assignmentScores, 0)
+    console.log("ass0 data ", assignment0Data)
 
     const bins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -49,7 +65,7 @@ export default function AssignmentDetails({ onLogin }) {
             ...x, Score: assignmentScores[i],
         }))
         .filter(({ Score }) => toggled[Score]);
-
+    console.log("students ", students)
     const contents = (
         <>
             <div style={{ height: "40vh" }}>
@@ -59,7 +75,7 @@ export default function AssignmentDetails({ onLogin }) {
                     cumulative={false}
                     normalized
                     valueAccessor={datum => datum}
-                    binType="categorical"
+                    binType="numeric"
                     renderTooltip={({ datum, color }) => (
                         <div>
                             <strong style={{ color }}>
@@ -86,12 +102,24 @@ export default function AssignmentDetails({ onLogin }) {
                 >
                     <BarSeries
                         animated
-                        rawData={assignmentScores}
+                        rawData={!assignmentScores || extractAssignmentData(assignmentScores, currentAssignment)}
                     />
                     <XAxis />
                     <YAxis />
                 </ResponsiveHistogram>
             </div>
+            <Dropdown>
+                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                    Choose assignment
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    {
+                        assignments.map((assignment, i) =>
+                            <Dropdown.Item onClick={() => setAssignment(i)}> {assignment} </Dropdown.Item>
+                        )
+                    }
+                </Dropdown.Menu>
+            </Dropdown>
             <BinSelectors bins={bins} toggled={toggled} onToggle={handleToggle} />
             <StudentTable students={students} onLogin={onLogin} />
         </>
