@@ -10,6 +10,8 @@ import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
 import computeTotals from "./computeTotals.js";
 
+import { getAssignmentLookup, getAssignments } from './LoadAssignmentsUtil.js';
+
 let ASSIGNMENTS = [];
 
 let LOOKUP = {};
@@ -20,20 +22,9 @@ let createAssignments;
 function initialize(header, scores) {
     ({ setSchema, createAssignments } = window);
     setSchema(header, scores);
-    ASSIGNMENTS = createAssignments();
-    LOOKUP = {};
-    for (const assignment of ASSIGNMENTS) {
-        initializeLookup(assignment);
-    }
-}
-
-function initializeLookup(assignment) {
-    LOOKUP[assignment.name] = assignment;
-    if (assignment.isTopic) {
-        for (const child of assignment.children) {
-            initializeLookup(child);
-        }
-    }
+    LOOKUP = getAssignmentLookup()
+    ASSIGNMENTS = getAssignments();
+    console.log(LOOKUP)
 }
 
 function extend(scores) {

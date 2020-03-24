@@ -7,6 +7,8 @@ import BinSelectors from "./BinSelectors.js";
 import StudentTable from "./StudentTable.js";
 import Dropdown from 'react-bootstrap/Dropdown'
 
+import { getAssignmentLookup } from './LoadAssignmentsUtil.js';
+
 const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest }) => (
     <Histogram
         width={parentWidth}
@@ -29,9 +31,14 @@ export default function AssignmentDetails({ onLogin }) {
         });
     }, []);
     console.log("data", data)
-    const assignments = ["Homework 1", "Homework 2"];
+    let assignments = ["Homework 1", "Homework 2"];
     const {createAssignments, setSchema} = window
     setSchema([], [])
+    console.log("getAssignmentLookup returns ", getAssignmentLookup())
+    const lookup = getAssignmentLookup()
+    assignments = Object.keys(lookup)
+                    .filter((name) => !lookup[name].isTopic)
+    console.log(assignments)
     const ASSIGNMENTS = createAssignments()
     for (const assignment of ASSIGNMENTS) {
         console.log(assignment)
@@ -47,9 +54,6 @@ export default function AssignmentDetails({ onLogin }) {
 
     const totalScores = assignmentScores.map((assignments) =>
         assignments.reduce((x, y) => x + y))
-
-    const assignment0Data = extractAssignmentData(assignmentScores, 0)
-    console.log("ass0 data ", assignment0Data)
 
     const bins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
