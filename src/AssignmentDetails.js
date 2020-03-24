@@ -60,14 +60,13 @@ export default function AssignmentDetails({ onLogin }) {
         toggled[i] = !toggled[i];
         setToggled(toggled.slice());
     };
-    console.log("assignmentScores", assignmentScores)
+
     const students = data
         .map((x, student) => ({
             ...x, Score: assignmentScores[student][assignmentIndex],
         }))
         .filter(({ Score }) => binSize ? toggled[Math.floor(Score / binSize)] : false);
-    console.log(toggled)
-    console.log("data", data)
+
     const TAs = data
         .map(x => x["TA"])
     const TANames = Array.from(new Set(TAs))
