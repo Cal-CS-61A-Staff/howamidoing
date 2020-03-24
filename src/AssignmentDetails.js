@@ -44,13 +44,15 @@ export default function AssignmentDetails({ onLogin }) {
     const assignmentScores = useMemo(() => (data.map(
         student => assignmentNames
             .map(assignmentName => student[assignmentName] || 0)
-            .map(x => Number.parseInt(x, 10))
+            .map(x => Number.parseFloat(x))
     )), [data, assignmentNames]);
 
     const totalScores = assignmentScores.map((scores) =>
         scores.reduce((x, y) => x + y))
 
-    const bins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const maxScore = assignment["maxScore"] || 0
+    const binSize = maxScore / 4;
+    const bins = assignment ? _.range(0, maxScore + 0.01, binSize) : [0, 1, 2, 3, 4, 5]
 
     const [toggled, setToggled] = useState(bins.map(() => false));
 
@@ -58,13 +60,14 @@ export default function AssignmentDetails({ onLogin }) {
         toggled[i] = !toggled[i];
         setToggled(toggled.slice());
     };
-
+    console.log("assignmentScores", assignmentScores)
     const students = data
-        .map((x, i) => ({
-            ...x, Score: assignmentScores[i],
+        .map((x, student) => ({
+            ...x, Score: assignmentScores[student][assignmentIndex],
         }))
-        .filter(({ Score }) => toggled[Score]);
-
+        .filter(({ Score }) => binSize ? toggled[Math.floor(Score / binSize)] : false);
+    console.log(toggled)
+    console.log("data", data)
     const TAs = data
         .map(x => x["TA"])
     const TANames = Array.from(new Set(TAs))
@@ -80,7 +83,7 @@ export default function AssignmentDetails({ onLogin }) {
                     normalized
                     valueAccessor={datum => datum}
                     binType="numeric"
-                    binValues={assignment ? _.range(0, assignment["maxScore"] + 0.01, assignment["maxScore"] / 4) : [1, 2, 3, 4, 5]}
+                    binValues={bins}
                     renderTooltip={({ datum, color }) => (
                         <div>
                             <strong style={{ color }}>
