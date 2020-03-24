@@ -5,7 +5,7 @@ import {
 import $ from "jquery";
 import BinSelectors from "./BinSelectors.js";
 import StudentTable from "./StudentTable.js";
-import Dropdown from 'react-bootstrap/Dropdown'
+import { Dropdown, Container, Row, Col } from 'react-bootstrap'
 import chunk from 'lodash/chunk';
 import _ from 'lodash';
 
@@ -21,7 +21,7 @@ const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest
 
 const extractAssignmentData = (arr, index, TA, TAs) => {
     return arr.map(scores => scores[index])
-              .filter((item, index) => TA === "All" || TAs[index] === TA)
+        .filter((item, index) => TA === "All" || TAs[index] === TA)
 }
 
 export default function AssignmentDetails({ onLogin }) {
@@ -33,11 +33,10 @@ export default function AssignmentDetails({ onLogin }) {
             setData(scores.map(x => Object.fromEntries(x.map((v, i) => [header[i], v]))));
         });
     }, []);
-    const {createAssignments, setSchema} = window
-    setSchema([], [])
+    window.setSchema([], [])
     const assignments = getAssignmentLookup()
     const assignmentNames = Object.keys(assignments)
-                    .filter((name) => !assignments[name].isTopic)
+        .filter((name) => !assignments[name].isTopic)
 
     const [assignmentName, setAssignmentName] = useState(assignmentNames[0])
     const [assignment, setAssignment] = useState(assignments[assignmentName])
@@ -81,7 +80,7 @@ export default function AssignmentDetails({ onLogin }) {
                     normalized
                     valueAccessor={datum => datum}
                     binType="numeric"
-                    binValues={assignment ? _.range(0, assignment["maxScore"] + 1, assignment["maxScore"]/4): [1,2,3,4,5]}
+                    binValues={assignment ? _.range(0, assignment["maxScore"] + 0.01, assignment["maxScore"] / 4) : [1, 2, 3, 4, 5]}
                     renderTooltip={({ datum, color }) => (
                         <div>
                             <strong style={{ color }}>
@@ -108,44 +107,50 @@ export default function AssignmentDetails({ onLogin }) {
                 >
                     <BarSeries
                         animated
-                        rawData={ extractAssignmentData(assignmentScores, assignmentIndex, TA, TAs)}
+                        rawData={extractAssignmentData(assignmentScores, assignmentIndex, TA, TAs)}
                     />
                     <XAxis />
                     <YAxis />
                 </ResponsiveHistogram>
             </div>
-            <Dropdown>
-                <Dropdown.Toggle variant="success" id="dropdown-basic">
-                    {assignmentName || "Choose assignment"}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    {
-                        assignmentNames.map((assignmentName, index) =>
-                            <Dropdown.Item onClick={() => {
-                                setAssignmentIndex(index)
-                                setAssignmentName(assignmentName)
-                                setAssignment(assignments[assignmentName])
-                            }}>
-                            {assignmentName} </Dropdown.Item>
-                        )
-                    }
-                </Dropdown.Menu>
-            </Dropdown>
-            <Dropdown>
-                <Dropdown.Toggle variant="success" id="dropdown-basic">
-                    {TA}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    {
-                        TANames.map((TAName, index) =>
-                            <Dropdown.Item onClick={() => {
-                                setTA(TAName)
-                            }}>
-                            {TAName} </Dropdown.Item>
-                        )
-                    }
-                </Dropdown.Menu>
-            </Dropdown>
+            <Row>
+                <Col>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            {assignmentName || "Choose assignment"}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {
+                                assignmentNames.map((assignmentName, index) =>
+                                    <Dropdown.Item onClick={() => {
+                                        setAssignmentIndex(index)
+                                        setAssignmentName(assignmentName)
+                                        setAssignment(assignments[assignmentName])
+                                    }}>
+                                        {assignmentName} </Dropdown.Item>
+                                )
+                            }
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Col>
+                <Col>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            {TA}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            {
+                                TANames.map((TAName, index) =>
+                                    <Dropdown.Item onClick={() => {
+                                        setTA(TAName)
+                                    }}>
+                                        {TAName} </Dropdown.Item>
+                                )
+                            }
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Col>
+            </Row>
             <BinSelectors bins={bins} toggled={toggled} onToggle={handleToggle} />
             <StudentTable students={students} onLogin={onLogin} />
         </>
