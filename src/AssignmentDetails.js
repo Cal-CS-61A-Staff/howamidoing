@@ -21,7 +21,7 @@ const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest
 
 const extractAssignmentData = (arr, index, TA, TAs) => {
     return arr.map(scores => scores[index])
-              .filter((item, index) => TA === "" || TAs[index] === TA)
+              .filter((item, index) => TA === "All" || TAs[index] === TA)
 }
 
 export default function AssignmentDetails({ onLogin }) {
@@ -68,6 +68,9 @@ export default function AssignmentDetails({ onLogin }) {
 
     const TAs = data
         .map(x => x["TA"])
+    const TANames = Array.from(new Set(TAs))
+    const [TA, setTA] = useState("All")
+
     const contents = (
         <>
             <div style={{ height: "40vh" }}>
@@ -105,7 +108,7 @@ export default function AssignmentDetails({ onLogin }) {
                 >
                     <BarSeries
                         animated
-                        rawData={ extractAssignmentData(assignmentScores, assignmentIndex, "Rahul", TAs)}
+                        rawData={ extractAssignmentData(assignmentScores, assignmentIndex, TA, TAs)}
                     />
                     <XAxis />
                     <YAxis />
@@ -124,6 +127,21 @@ export default function AssignmentDetails({ onLogin }) {
                                 setAssignment(assignments[assignmentName])
                             }}>
                             {assignmentName} </Dropdown.Item>
+                        )
+                    }
+                </Dropdown.Menu>
+            </Dropdown>
+            <Dropdown>
+                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                    {TA}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    {
+                        TANames.map((TAName, index) =>
+                            <Dropdown.Item onClick={() => {
+                                setTA(TAName)
+                            }}>
+                            {TAName} </Dropdown.Item>
                         )
                     }
                 </Dropdown.Menu>
