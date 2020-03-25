@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useMemo } from "react";
+import $ from "jquery";
+import _ from "lodash";
+
 import {
     Histogram, BarSeries, withParentSize, XAxis, YAxis,
 } from "@data-ui/histogram";
-import $ from "jquery";
+import { Dropdown, Row, Col } from "react-bootstrap";
+
 import BinSelectors from "./BinSelectors.js";
 import StudentTable from "./StudentTable.js";
-import { Dropdown, Container, Row, Col } from 'react-bootstrap'
-import chunk from 'lodash/chunk';
-import _ from 'lodash';
 
-import { getAssignmentLookup } from './LoadAssignmentsUtil.js';
+import { getAssignmentLookup } from "./loadAssignments.js";
 
 const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest }) => (
     <Histogram
@@ -19,40 +20,36 @@ const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest
     />
 ));
 
-const extractAssignmentData = (arr, index, TA, TAs) => {
-    return arr.map(scores => scores[index])
-        .filter((item, index) => TA === "All" || TAs[index] === TA)
-}
+const extractAssignmentData = (arr, index, TA, TAs) => (
+    arr.map(scores => scores[index]).filter((score, i) => TA === "All" || TAs[i] === TA)
+);
 
 export default function AssignmentDetails({ onLogin }) {
     const [data, setData] = useState([]);
-    const [assignmentIndex, setAssignmentIndex] = useState(0)
+    const [assignmentIndex, setAssignmentIndex] = useState(0);
 
     useEffect(() => {
         $.post("/allScores").done(({ header, scores }) => {
             setData(scores.map(x => Object.fromEntries(x.map((v, i) => [header[i], v]))));
         });
     }, []);
-    window.setSchema([], [])
-    const assignments = getAssignmentLookup()
+    window.setSchema([], []);
+    const assignments = getAssignmentLookup();
     const assignmentNames = Object.keys(assignments)
-        .filter((name) => !assignments[name].isTopic)
+        .filter(name => !assignments[name].isTopic);
 
-    const [assignmentName, setAssignmentName] = useState(assignmentNames[0])
-    const [assignment, setAssignment] = useState(assignments[assignmentName])
+    const [currentAssignmentName, setCurrentAssignmentName] = useState(assignmentNames[0]);
+    const [assignment, setAssignment] = useState(assignments[currentAssignmentName]);
 
     const assignmentScores = useMemo(() => (data.map(
         student => assignmentNames
             .map(assignmentName => student[assignmentName] || 0)
-            .map(x => Number.parseFloat(x))
+            .map(x => Number.parseFloat(x)),
     )), [data, assignmentNames]);
 
-    const totalScores = assignmentScores.map((scores) =>
-        scores.reduce((x, y) => x + y))
-
-    const maxScore = assignment["maxScore"] || 0
+    const maxScore = assignment.maxScore || 0;
     const binSize = maxScore / 4;
-    const bins = assignment ? _.range(0, maxScore + 0.01, binSize) : [0, 1, 2, 3, 4, 5]
+    const bins = assignment ? _.range(0, maxScore + 0.01, binSize) : [0, 1, 2, 3, 4, 5];
 
     const [toggled, setToggled] = useState(bins.map(() => false));
 
@@ -65,12 +62,12 @@ export default function AssignmentDetails({ onLogin }) {
         .map((x, student) => ({
             ...x, Score: assignmentScores[student][assignmentIndex],
         }))
-        .filter(({ Score }) => binSize ? toggled[Math.floor(Score / binSize)] : false);
+        .filter(({ Score }) => (binSize ? toggled[Math.floor(Score / binSize)] : false));
 
     const TAs = data
-        .map(x => x["TA"])
-    const TANames = Array.from(new Set(TAs))
-    const [TA, setTA] = useState("All")
+        .map(x => x.TA);
+    const TANames = Array.from(new Set(TAs));
+    const [TA, setTA] = useState("All");
 
     const contents = (
         <>
@@ -119,18 +116,20 @@ export default function AssignmentDetails({ onLogin }) {
                 <Col>
                     <Dropdown>
                         <Dropdown.Toggle variant="success" id="dropdown-basic">
-                            {assignmentName || "Choose assignment"}
+                            {currentAssignmentName || "Choose assignment"}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             {
-                                assignmentNames.map((assignmentName, index) =>
+                                assignmentNames.map((assignmentName, index) => (
                                     <Dropdown.Item onClick={() => {
-                                        setAssignmentIndex(index)
-                                        setAssignmentName(assignmentName)
-                                        setAssignment(assignments[assignmentName])
-                                    }}>
-                                        {assignmentName} </Dropdown.Item>
-                                )
+                                        setAssignmentIndex(index);
+                                        setCurrentAssignmentName(assignmentName);
+                                        setAssignment(assignments[assignmentName]);
+                                    }}
+                                    >
+                                        {assignmentName}
+                                    </Dropdown.Item>
+                                ))
                             }
                         </Dropdown.Menu>
                     </Dropdown>
@@ -142,12 +141,14 @@ export default function AssignmentDetails({ onLogin }) {
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             {
-                                TANames.map((TAName, index) =>
+                                TANames.map(TAName => (
                                     <Dropdown.Item onClick={() => {
-                                        setTA(TAName)
-                                    }}>
-                                        {TAName} </Dropdown.Item>
-                                )
+                                        setTA(TAName);
+                                    }}
+                                    >
+                                        {TAName}
+                                    </Dropdown.Item>
+                                ))
                             }
                         </Dropdown.Menu>
                     </Dropdown>

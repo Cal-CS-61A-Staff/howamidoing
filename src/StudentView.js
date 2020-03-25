@@ -10,19 +10,18 @@ import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
 import computeTotals from "./computeTotals.js";
 
-import { getAssignmentLookup, getAssignments } from './LoadAssignmentsUtil.js';
+import { getAssignmentLookup, getAssignments } from "./loadAssignments.js";
 
 let ASSIGNMENTS = [];
 
 let LOOKUP = {};
 
 let setSchema;
-let createAssignments;
 
 function initialize(header, scores) {
-    ({ setSchema, createAssignments } = window);
+    ({ setSchema } = window.setSchema);
     setSchema(header, scores);
-    LOOKUP = getAssignmentLookup()
+    LOOKUP = getAssignmentLookup();
     ASSIGNMENTS = getAssignments();
     console.log(LOOKUP)
 }
