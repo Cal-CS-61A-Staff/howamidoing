@@ -23,9 +23,7 @@ export default function AssignmentDetails({ onLogin }) {
         });
     }, []);
 
-    const labs = [
-        "Imaging 1", "Imaging 2", "Imaging 3", "Touchscreen 1", "Touchscreen 2",
-        "Touchscreen 3A", "Touchscreen 3B", "APS 1", "APS 2"];
+    const labs = ["Imaging 1_in-person", "Imaging 2_in-person", "Imaging 3_in-person", "Touchscreen 1_in-person", "Touchscreen 2_in-person", "Touchscreen 3A_in-person", "Touchscreen 3B_in-person", "APS 1_in-person", "APS 2_in-person", "Imaging 1_remote", "Imaging 2_remote", "Imaging 3_remote", "Touchscreen 1_remote", "Touchscreen 2_remote", "Touchscreen 3A_remote", "Touchscreen 3B_remote", "APS 1_remote", "APS 2_remote"];
 
     const assignmentScores = useMemo(() => (data.map(
         student => labs
