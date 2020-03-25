@@ -23,7 +23,6 @@ function initialize(header, scores) {
     setSchema(header, scores);
     LOOKUP = getAssignmentLookup();
     ASSIGNMENTS = getAssignments();
-    console.log(LOOKUP)
 }
 
 function extend(scores) {
