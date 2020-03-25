@@ -1,10 +1,10 @@
-import datetime
 import json
 import os
-import csv
 import urllib.parse
 from io import StringIO
 from contextlib import contextmanager
+import sys
+from setup_functions import set_default_config, set_grades
 
 from werkzeug import security
 
@@ -22,8 +22,6 @@ from flask_oauthlib.client import OAuth
 import requests
 from sqlalchemy import create_engine
 
-from secrets import SECRET
-
 CONSUMER_KEY = "61a-grade-view"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,12 +29,7 @@ GRADES_PATH = os.path.join(BASE_DIR, "grades.csv")
 
 AUTHORIZED_ROLES = ["staff", "instructor"]
 
-
-if __name__ == "__main__":
-    engine = create_engine("mysql://localhost/statuscheck")
-else:
-    engine = create_engine(os.getenv("DATABASE_URL"))
-
+dev_env = "gunicorn" not in os.environ.get("SERVER_SOFTWARE", "")
 
 @contextmanager
 def connect_db():
@@ -44,6 +37,8 @@ def connect_db():
 
         def db(*args):
             try:
+                if dev_env:
+                    args = (args[0].replace("%s", "?"), *args[1:])
                 if isinstance(args[1][0], str):
                     raise TypeError
             except (IndexError, TypeError):
@@ -54,6 +49,18 @@ def connect_db():
 
         yield db
 
+if dev_env:
+    # for mysql, use "mysql://localhost/statuscheck"
+    engine = create_engine('sqlite:///' + os.path.join(BASE_DIR, 'app.db'))
+    SECRET = "kmSPJYPzKJglOOOmr7q0irMfBVMRFXN"
+    CONSUMER_KEY = "local-dev-all"
+    with connect_db() as db:
+        with open("./public/config/dummy_grade_data.csv") as grades:
+            set_grades(grades.read(), "cs61a", db)
+        set_default_config(db)
+else:
+    SECRET = os.getenv("OAUTH_SECRET")
+    engine = create_engine(os.getenv("DATABASE_URL"))
 
 with connect_db() as db:
     db(
@@ -78,7 +85,6 @@ with connect_db() as db:
        courseCode varchar(128),
        lastUpdated TIMESTAMP)"""
     )
-
 
 def get_course_code():
     try:
@@ -117,6 +123,8 @@ def last_updated():
 
 
 def is_staff(remote):
+    if(dev_env):
+        return True
     token = session.get("dev_token") or request.cookies.get("dev_token")
     ret = remote.get("user", token=token)
     for course in ret.data["data"]["participations"]:
@@ -262,12 +270,14 @@ def create_client(app):
 
     @app.route("/setConfig", methods=["POST"])
     def set_config():
+        print("set config c")
         if not is_staff(remote):
             return jsonify({"success": False})
         data = request.form.get("data")
         with connect_db() as db:
             db("DELETE FROM configs WHERE courseCode=%s", [get_course_code()])
             db("INSERT INTO configs VALUES (%s, %s)", [get_course_code(), data])
+        print("data ", data, type(data))
         return jsonify({"success": True})
 
     @app.route("/setGrades", methods=["POST"])
@@ -275,30 +285,7 @@ def create_client(app):
         if not is_staff(remote):
             return jsonify({"success": False})
         data = request.form.get("data")
-        course_code = get_course_code()
-        reader = csv.reader(StringIO(data))
-        header = next(reader)
-        email_index = header.index("Email")
-        with connect_db() as db:
-            db("DELETE FROM students WHERE courseCode=%s", [course_code])
-            db("DELETE FROM headers WHERE courseCode=%s", [course_code])
-            db("INSERT INTO headers VALUES (%s, %s)", [course_code, json.dumps(header)])
-            for row in reader:
-                short_data = {x: row[header.index(x)] for x in ["Email", "SID", "Name"]}
-                db(
-                    "INSERT INTO students VALUES (%s, %s, %s, %s)",
-                    [
-                        course_code,
-                        row[email_index],
-                        json.dumps(short_data),
-                        json.dumps(row),
-                    ],
-                )
-            db("DELETE FROM lastUpdated WHERE courseCode=%s", [course_code])
-            db(
-                "INSERT INTO lastUpdated VALUES (%s, %s)",
-                [course_code, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
-            )
+        set_grades(data, get_course_code())
 
         return jsonify({"success": True})
 
@@ -341,16 +328,23 @@ def create_client(app):
 
     return remote
 
+def printToErr(printFunction):
+    def print(*s):
+        printFunction(*s, file=sys.stderr)
+    return print
+print = printToErr(print)
 
 app = Flask(
     __name__, static_url_path="", static_folder="static", template_folder="static"
 )
 app.secret_key = SECRET
-app.config.update(
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax',
-)
+
+if not dev_env:
+    app.config.update(
+        SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE='Lax',
+    )
 create_client(app)
 
 if __name__ == "__main__":
