@@ -83,9 +83,11 @@ class App extends Component {
                         <div className="col">
                             <br />
                             <h1 className="display-4">
+                                <a href="/" style={{ color: 'black', textDecoration: 'none' }}>
                                 <strong>{window.COURSE_CODE}</strong>
                                 {" "}
-                            Status Check
+                                    Status Check
+                                </a>
                                 <span className="badge badge-danger warningBadge">Beta</span>
                             </h1>
                         </div>
