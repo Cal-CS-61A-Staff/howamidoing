@@ -19,7 +19,7 @@ let LOOKUP = {};
 let setSchema;
 
 function initialize(header, scores) {
-    ({ setSchema } = window.setSchema);
+    ({ setSchema } = window);
     setSchema(header, scores);
     LOOKUP = getAssignmentLookup();
     ASSIGNMENTS = getAssignments();
