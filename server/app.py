@@ -54,10 +54,6 @@ if dev_env:
     engine = create_engine('sqlite:///' + os.path.join(BASE_DIR, 'app.db'))
     SECRET = "kmSPJYPzKJglOOOmr7q0irMfBVMRFXN"
     CONSUMER_KEY = "local-dev-all"
-    with connect_db() as db:
-        with open("./public/config/dummy_grade_data.csv") as grades:
-            set_grades(grades.read(), "cs61a", db)
-        set_default_config(db)
 else:
     SECRET = os.getenv("OAUTH_SECRET")
     engine = create_engine(os.getenv("DATABASE_URL"))
@@ -85,6 +81,12 @@ with connect_db() as db:
        courseCode varchar(128),
        lastUpdated TIMESTAMP)"""
     )
+
+if dev_env:
+    with connect_db() as db:
+        with open("./public/config/dummy_grade_data.csv") as grades:
+            set_grades(grades.read(), "cs61a", db)
+        set_default_config(db)
 
 def get_course_code():
     try:
