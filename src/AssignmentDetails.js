@@ -10,7 +10,8 @@ import { Dropdown, Row, Col } from "react-bootstrap";
 import BinSelectors from "./BinSelectors.js";
 import StudentTable from "./StudentTable.js";
 
-import { getAssignmentLookup } from "./loadAssignments.js";
+import { getAssignmentLookup, getAssignments } from "./loadAssignments.js";
+import computeTotals from "./computeTotals.js";
 
 const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest }) => (
     <Histogram
@@ -20,23 +21,59 @@ const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest
     />
 ));
 
+const extend = (scores, lookup) => {
+    const out = JSON.parse(JSON.stringify(scores));
+    for (const key of Object.keys(lookup)) {
+        if (out[key] === undefined) {
+            out[key] = NaN;
+        }
+    }
+    return out;
+}
+
 const extractAssignmentData = (arr, index, TA, TAs) => (
     arr.map(scores => scores[index]).filter((score, i) => TA === "All" || TAs[i] === TA)
 );
 
+const addAssignmentTotals = (data, assignments, ASSIGNMENTS) => {
+    data = JSON.parse(JSON.stringify(data));
+    for (let student = 0; student < data.length; ++student) {
+        let scores = {}
+        const header = data[student]
+        for (const title in header) {
+            if (assignments[title]) {
+                scores[title] = header[title];
+            }
+        }
+        scores = extend(scores, assignments)
+        console.log(scores)
+        const totals = computeTotals(ASSIGNMENTS, scores, false);
+        console.log(totals)
+        for (const assignment in totals) {
+            header[assignment] = totals[assignment]
+        }
+    }
+    return data;
+}
+
 export default function AssignmentDetails({ onLogin }) {
-    const [data, setData] = useState([]);
+    console.log("BEGINNNING")
+    const [data, setData] = useState([])
     const [assignmentIndex, setAssignmentIndex] = useState(0);
+    const [header, setHeader] = useState([]);
 
     useEffect(() => {
         $.post("/allScores").done(({ header, scores }) => {
+            setHeader(header);
             setData(scores.map(x => Object.fromEntries(x.map((v, i) => [header[i], v]))));
         });
     }, []);
-    window.setSchema([], []);
+    window.setSchema(header, []);
+
     const assignments = getAssignmentLookup();
-    const assignmentNames = Object.keys(assignments)
-        .filter(name => !assignments[name].isTopic);
+    const ASSIGNMENTS = getAssignments();
+
+    const assignmentNames = Object.keys(assignments);
 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(assignmentNames[0]);
     const [assignment, setAssignment] = useState(assignments[currentAssignmentName]);
@@ -47,9 +84,18 @@ export default function AssignmentDetails({ onLogin }) {
             .map(x => Number.parseFloat(x)),
     )), [data, assignmentNames]);
 
+    useEffect(() => {
+        setData(addAssignmentTotals(data, assignments, ASSIGNMENTS));
+        setAssignment(assignments[currentAssignmentName])
+    }, [data.length === 0]);
+
+    console.log("ASSN SCORES ", assignmentScores)
     const maxScore = assignment.maxScore || 0;
     const binSize = maxScore / 4;
-    const bins = assignment ? _.range(0, maxScore + 0.01, binSize) : [0, 1, 2, 3, 4, 5];
+    console.log("ASSIGNMENT is ", assignment)
+    console.log("ASSIGNMENTS ARE ", assignments)
+    const bins = assignment.maxScore && assignment.maxScore != Infinity ? _.range(0, maxScore + 0.01, binSize) : [0, 1, 2, 3, 4, 5];
+    console.log("BINS ARE ", bins)
 
     const [toggled, setToggled] = useState(bins.map(() => false));
 
@@ -69,6 +115,7 @@ export default function AssignmentDetails({ onLogin }) {
     const TANames = Array.from(new Set(TAs));
     const [TA, setTA] = useState("All");
 
+    console.log("YEET", extractAssignmentData(assignmentScores, assignmentIndex, TA, TAs))
     const contents = (
         <>
             <div style={{ height: "40vh" }}>
