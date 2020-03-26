@@ -18,16 +18,16 @@ let LOOKUP = {};
 
 let setSchema;
 
-function initialize(header, scores) {
+const initialize = (header, scores) => {
     ({ setSchema } = window);
     setSchema(header, scores);
     LOOKUP = getAssignmentLookup();
     ASSIGNMENTS = getAssignments();
 }
 
-function extend(scores) {
+export const extend = (scores, lookup) => {
     const out = JSON.parse(JSON.stringify(scores));
-    for (const key of Object.keys(LOOKUP)) {
+    for (const key of Object.keys(lookup)) {
         if (out[key] === undefined) {
             out[key] = NaN;
         }
@@ -50,7 +50,7 @@ class StudentView extends Component {
 
         this.state = {
             scores,
-            plannedScores: extend(scores),
+            plannedScores: extend(scores, LOOKUP),
             future: false,
         };
     }
@@ -87,7 +87,7 @@ class StudentView extends Component {
     };
 
     render() {
-        const scores = extend(this.state.scores);
+        const scores = extend(this.state.scores, LOOKUP);
 
         if (this.state.future) {
             for (const elem of Object.values(LOOKUP)) {

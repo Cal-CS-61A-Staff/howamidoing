@@ -12,6 +12,7 @@ import BinSelectors from "./BinSelectors.js";
 import StudentTable from "./StudentTable.js";
 
 import { getAssignmentLookup, getAssignments } from "./loadAssignments.js";
+import { extend } from "./StudentView"
 import computeTotals from "./computeTotals.js";
 
 const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest }) => (
@@ -22,20 +23,13 @@ const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest
     />
 ));
 
-const extend = (scores, lookup) => {
-    const out = JSON.parse(JSON.stringify(scores));
-    for (const key of Object.keys(lookup)) {
-        if (out[key] === undefined) {
-            out[key] = NaN;
-        }
-    }
-    return out;
-}
-
 const extractAssignmentData = (arr, index, TA, TAs, rangeMin, rangeMax) => (
     arr.map(scores => scores[index]).filter((score, i) =>
-        (TA === "All" || TAs[i] === TA) && score <= rangeMax && score >= rangeMin)
+        showScore(score, rangeMin, rangeMax, TA, TAs[i]))
 );
+
+const showScore = (score, rangeMin, rangeMax, TAToShow, TA) =>
+    (TAToShow === "All" || TAToShow === TA) && score <= rangeMax && score >= rangeMin
 
 const addAssignmentTotals = (data, assignments, topics) => {
     data = JSON.parse(JSON.stringify(data));
@@ -97,17 +91,12 @@ export default function AssignmentDetails({ onLogin }) {
     const defaultBins = [0, 1, 2, 3, 4, 5];
     const bins = assignment.maxScore && assignment.maxScore !== Infinity ? _.range(0, maxScore + 0.01, binSize) : defaultBins;
 
-    const [toggled, setToggled] = useState(bins.map(() => false));
     const [rangeMin, setRangeMin] = useState(0)
     const [rangeMax, setRangeMax] = useState(bins[bins.length - 1])
 
     useEffect(() => {
         setRangeMax(bins[bins.length - 1])
     }, [bins === defaultBins])
-    const handleToggle = (i) => {
-        toggled[i] = !toggled[i];
-        setToggled(toggled.slice());
-    };
 
     const TAs = data
         .map(x => x.TA);
@@ -118,7 +107,7 @@ export default function AssignmentDetails({ onLogin }) {
         .map((x, student) => ({
             ...x, Score: assignmentScores[student][assignmentIndex],
         }))
-        .filter((student) => (student.Score >= rangeMin && student.Score <= rangeMax && (TA === 'All' || student.TA === TA)));
+        .filter((student) => showScore(student.Score, rangeMin, rangeMax, TA, student.TA));
 
     const contents = (
         <>
@@ -218,7 +207,6 @@ export default function AssignmentDetails({ onLogin }) {
                     />
                 </Col>
             </Row>
-            <BinSelectors bins={bins} toggled={toggled} onToggle={handleToggle} />
             <StudentTable students={students} onLogin={onLogin} />
         </>
     );
