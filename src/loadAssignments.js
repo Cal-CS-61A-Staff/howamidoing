@@ -1,5 +1,4 @@
 export const getAssignments = () => {
-    console.log("getAssignments was called")
     const { createAssignments } = window;
     return createAssignments();
 };

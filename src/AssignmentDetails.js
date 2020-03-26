@@ -35,7 +35,7 @@ const extractAssignmentData = (arr, index, TA, TAs) => (
     arr.map(scores => scores[index]).filter((score, i) => TA === "All" || TAs[i] === TA)
 );
 
-const addAssignmentTotals = (data, assignments, ASSIGNMENTS) => {
+const addAssignmentTotals = (data, assignments, topics) => {
     data = JSON.parse(JSON.stringify(data));
     for (let student = 0; student < data.length; ++student) {
         let scores = {}
@@ -46,9 +46,7 @@ const addAssignmentTotals = (data, assignments, ASSIGNMENTS) => {
             }
         }
         scores = extend(scores, assignments)
-        console.log(scores)
-        const totals = computeTotals(ASSIGNMENTS, scores, false);
-        console.log(totals)
+        const totals = computeTotals(topics, scores, false);
         for (const assignment in totals) {
             header[assignment] = totals[assignment]
         }
@@ -57,7 +55,6 @@ const addAssignmentTotals = (data, assignments, ASSIGNMENTS) => {
 }
 
 export default function AssignmentDetails({ onLogin }) {
-    console.log("BEGINNNING")
     const [data, setData] = useState([])
     const [assignmentIndex, setAssignmentIndex] = useState(0);
     const [header, setHeader] = useState([]);
@@ -71,8 +68,7 @@ export default function AssignmentDetails({ onLogin }) {
     window.setSchema(header, []);
 
     const assignments = getAssignmentLookup();
-    const ASSIGNMENTS = getAssignments();
-
+    const topics = getAssignments();
     const assignmentNames = Object.keys(assignments);
 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(assignmentNames[0]);
@@ -85,17 +81,13 @@ export default function AssignmentDetails({ onLogin }) {
     )), [data, assignmentNames]);
 
     useEffect(() => {
-        setData(addAssignmentTotals(data, assignments, ASSIGNMENTS));
+        setData(addAssignmentTotals(data, assignments, topics));
         setAssignment(assignments[currentAssignmentName])
     }, [data.length === 0]);
 
-    console.log("ASSN SCORES ", assignmentScores)
     const maxScore = assignment.maxScore || 0;
     const binSize = maxScore / 4;
-    console.log("ASSIGNMENT is ", assignment)
-    console.log("ASSIGNMENTS ARE ", assignments)
     const bins = assignment.maxScore && assignment.maxScore != Infinity ? _.range(0, maxScore + 0.01, binSize) : [0, 1, 2, 3, 4, 5];
-    console.log("BINS ARE ", bins)
 
     const [toggled, setToggled] = useState(bins.map(() => false));
 
@@ -115,7 +107,6 @@ export default function AssignmentDetails({ onLogin }) {
     const TANames = Array.from(new Set(TAs));
     const [TA, setTA] = useState("All");
 
-    console.log("YEET", extractAssignmentData(assignmentScores, assignmentIndex, TA, TAs))
     const contents = (
         <>
             <div style={{ height: "40vh" }}>
