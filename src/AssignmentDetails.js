@@ -118,7 +118,7 @@ export default function AssignmentDetails({ onLogin }) {
             ...x, Score: assignmentScores[student][assignmentIndex],
         }))
         .filter((student) => (student.Score >= rangeMin && student.Score <= rangeMax && (TA === 'All' || student.TA === TA)));
-
+    const range = [0, 100]
     const contents = (
         <>
             <div style={{ height: "40vh" }}>
@@ -211,7 +211,7 @@ export default function AssignmentDetails({ onLogin }) {
                     <Slider
                         min={0}
                         max={bins[bins.length - 1] || 0}
-                        defaultValue={[0, bins[bins.length - 1 || 0]]}
+                        value={[rangeMin, rangeMax]}
                         valueLabelDisplay="auto"
                         onChange={(_, values) => updateBins(values, setRangeMin, setRangeMax)}
                     />
