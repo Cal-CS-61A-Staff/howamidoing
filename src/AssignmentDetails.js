@@ -104,22 +104,20 @@ export default function AssignmentDetails({ onLogin }) {
     useEffect(() => {
         setRangeMax(bins[bins.length - 1])
     }, [bins === defaultBins])
-    console.log("RANGE MAX ", rangeMax)
     const handleToggle = (i) => {
         toggled[i] = !toggled[i];
         setToggled(toggled.slice());
     };
 
-    const students = data
-        .map((x, student) => ({
-            ...x, Score: assignmentScores[student][assignmentIndex],
-        }))
-        .filter(({ Score }) => (Score >= rangeMin && Score <= rangeMax));
-
     const TAs = data
         .map(x => x.TA);
     const TANames = Array.from(new Set(TAs));
     const [TA, setTA] = useState("All");
+    const students = data
+        .map((x, student) => ({
+            ...x, Score: assignmentScores[student][assignmentIndex],
+        }))
+        .filter((student) => (student.Score >= rangeMin && student.Score <= rangeMax && (TA === 'All' || student.TA === TA)));
 
     const contents = (
         <>
