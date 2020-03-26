@@ -6,6 +6,7 @@ import {
     Histogram, BarSeries, withParentSize, XAxis, YAxis,
 } from "@data-ui/histogram";
 import { Dropdown, Row, Col } from "react-bootstrap";
+import { Slider } from '@material-ui/core';
 
 import BinSelectors from "./BinSelectors.js";
 import StudentTable from "./StudentTable.js";
@@ -31,8 +32,9 @@ const extend = (scores, lookup) => {
     return out;
 }
 
-const extractAssignmentData = (arr, index, TA, TAs) => (
-    arr.map(scores => scores[index]).filter((score, i) => TA === "All" || TAs[i] === TA)
+const extractAssignmentData = (arr, index, TA, TAs, rangeMin, rangeMax) => (
+    arr.map(scores => scores[index]).filter((score, i) =>
+        (TA === "All" || TAs[i] === TA) && score <= rangeMax && score >= rangeMin)
 );
 
 const addAssignmentTotals = (data, assignments, topics) => {
@@ -52,6 +54,11 @@ const addAssignmentTotals = (data, assignments, topics) => {
         }
     }
     return data;
+}
+
+const updateBins = (value, setRangeMin, setRangeMax) => {
+    setRangeMin(value[0])
+    setRangeMax(value[1])
 }
 
 export default function AssignmentDetails({ onLogin }) {
@@ -87,10 +94,17 @@ export default function AssignmentDetails({ onLogin }) {
 
     const maxScore = assignment.maxScore || 0;
     const binSize = maxScore / 4;
-    const bins = assignment.maxScore && assignment.maxScore != Infinity ? _.range(0, maxScore + 0.01, binSize) : [0, 1, 2, 3, 4, 5];
+    const defaultBins = [0, 1, 2, 3, 4, 5];
+    const bins = assignment.maxScore && assignment.maxScore !== Infinity ? _.range(0, maxScore + 0.01, binSize) : defaultBins;
 
     const [toggled, setToggled] = useState(bins.map(() => false));
+    const [rangeMin, setRangeMin] = useState(0)
+    const [rangeMax, setRangeMax] = useState(bins[bins.length - 1])
 
+    useEffect(() => {
+        setRangeMax(bins[bins.length - 1])
+    }, [bins === defaultBins])
+    console.log("RANGE MAX ", rangeMax)
     const handleToggle = (i) => {
         toggled[i] = !toggled[i];
         setToggled(toggled.slice());
@@ -100,7 +114,7 @@ export default function AssignmentDetails({ onLogin }) {
         .map((x, student) => ({
             ...x, Score: assignmentScores[student][assignmentIndex],
         }))
-        .filter(({ Score }) => (binSize ? toggled[Math.floor(Score / binSize)] : false));
+        .filter(({ Score }) => (Score >= rangeMin && Score <= rangeMax));
 
     const TAs = data
         .map(x => x.TA);
@@ -110,45 +124,47 @@ export default function AssignmentDetails({ onLogin }) {
     const contents = (
         <>
             <div style={{ height: "40vh" }}>
-                <ResponsiveHistogram
-                    ariaLabel="Lab score histogram"
-                    orientation="vertical"
-                    cumulative={false}
-                    normalized
-                    valueAccessor={datum => datum}
-                    binType="numeric"
-                    binValues={bins}
-                    renderTooltip={({ datum, color }) => (
-                        <div>
-                            <strong style={{ color }}>
-                                {datum.bin0}
+                {students.length === 0 ||
+                    <ResponsiveHistogram
+                        ariaLabel="Lab score histogram"
+                        orientation="vertical"
+                        cumulative={false}
+                        normalized
+                        valueAccessor={datum => datum}
+                        binType="numeric"
+                        binValues={bins}
+                        renderTooltip={({ datum, color }) => (
+                            <div>
+                                <strong style={{ color }}>
+                                    {datum.bin0}
+                                    {" "}
+                                    to
                                 {" "}
-                                to
-                                {" "}
-                                {datum.bin1}
-                            </strong>
-                            <div>
-                                <strong>count </strong>
-                                {datum.count}
+                                    {datum.bin1}
+                                </strong>
+                                <div>
+                                    <strong>count </strong>
+                                    {datum.count}
+                                </div>
+                                <div>
+                                    <strong>cumulative </strong>
+                                    {datum.cumulative}
+                                </div>
+                                <div>
+                                    <strong>density </strong>
+                                    {datum.density}
+                                </div>
                             </div>
-                            <div>
-                                <strong>cumulative </strong>
-                                {datum.cumulative}
-                            </div>
-                            <div>
-                                <strong>density </strong>
-                                {datum.density}
-                            </div>
-                        </div>
-                    )}
-                >
-                    <BarSeries
-                        animated
-                        rawData={extractAssignmentData(assignmentScores, assignmentIndex, TA, TAs)}
-                    />
-                    <XAxis />
-                    <YAxis />
-                </ResponsiveHistogram>
+                        )}
+                    >
+                        <BarSeries
+                            animated
+                            rawData={extractAssignmentData(assignmentScores, assignmentIndex, TA, TAs, rangeMin, rangeMax)}
+                        />
+                        <XAxis />
+                        <YAxis />
+                    </ResponsiveHistogram>
+                }
             </div>
             <Row>
                 <Col>
@@ -190,6 +206,17 @@ export default function AssignmentDetails({ onLogin }) {
                             }
                         </Dropdown.Menu>
                     </Dropdown>
+                </Col>
+            </Row>
+            <Row>
+                <Col md={3}>
+                    <Slider
+                        min={0}
+                        max={bins[bins.length - 1] || 0}
+                        defaultValue={[0, bins[bins.length - 1 || 0]]}
+                        valueLabelDisplay="auto"
+                        onChange={(_, values) => updateBins(values, setRangeMin, setRangeMax)}
+                    />
                 </Col>
             </Row>
             <BinSelectors bins={bins} toggled={toggled} onToggle={handleToggle} />
