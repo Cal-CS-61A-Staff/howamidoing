@@ -171,8 +171,8 @@ def create_client(app):
     def index():
         return render_template("index.html", courseCode=get_course_code())
 
-    @app.route("/labhistogram")
-    def labhistogram():
+    @app.route("/histogram")
+    def histogram():
         return render_template("index.html", courseCode=get_course_code())
 
     @app.route("/redirect")

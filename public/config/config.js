@@ -54,18 +54,18 @@ export function createAssignments() {
                     Assignment("Hog (Composition)", 2),
                 ]),
                 Topic("Cats Project", [
-                  Assignment("Cats (Total)", 18),
-                  Assignment("Cats Checkpoint (Total)", 1),
-                  Assignment("Cats (Composition)", 2),
+                    Assignment("Cats (Total)", 18),
+                    Assignment("Cats Checkpoint (Total)", 1),
+                    Assignment("Cats (Composition)", 2),
                 ]),
                 Topic("Ants Project", [
-                  Assignment("Ants (Total)", 30),
-                  Assignment("Ants Checkpoint (Total)", 1),
-                  Assignment("Ants (Composition)", 2),
+                    Assignment("Ants (Total)", 30),
+                    Assignment("Ants Checkpoint (Total)", 1),
+                    Assignment("Ants (Composition)", 2),
                 ]),
                 Topic("Scheme Project", [
-                  Assignment("Scheme (Total)", 28),
-                  Assignment("Scheme Checkpoint (Total)", 1),
+                    Assignment("Scheme (Total)", 28),
+                    Assignment("Scheme Checkpoint (Total)", 1),
                 ]),
             ]),
             Topic("Lab", [
@@ -99,12 +99,12 @@ export function computeNeededFinalScore(scores) {
     }
 
     const totalNonFinal = Homework
-                        + Projects
-                        + MT1
-                        + MT2
-                        + Recovery;
-                        //+ examRecover(MT1, Clobber, 40)
-                        //+ examRecover(MT2, Clobber, 50);
+        + Projects
+        + MT1
+        + MT2
+        + Recovery;
+    //+ examRecover(MT1, Clobber, 40)
+    //+ examRecover(MT2, Clobber, 50);
 
     const needed = [];
     const grades = [];
