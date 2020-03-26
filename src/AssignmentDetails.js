@@ -112,7 +112,6 @@ export default function AssignmentDetails({ onLogin }) {
     const TAs = data
         .map(x => x.TA);
     TAs.push("All");
-    console.log("TAS is ", TAs)
     const TANames = Array.from(new Set(TAs));
     const [TA, setTA] = useState("All");
     const students = data
@@ -213,7 +212,7 @@ export default function AssignmentDetails({ onLogin }) {
                     <Slider
                         min={0}
                         max={bins[bins.length - 1] || 0}
-                        defaultValue={[0, bins[bins.length - 1 || 0]]}
+                        value={[rangeMin, rangeMax]}
                         valueLabelDisplay="auto"
                         onChange={(_, values) => updateBins(values, setRangeMin, setRangeMax)}
                     />
