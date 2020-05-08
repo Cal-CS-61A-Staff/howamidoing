@@ -1,7 +1,6 @@
 import json
 import os
 import urllib.parse
-from io import StringIO
 from contextlib import contextmanager
 import sys
 from setup_functions import set_default_config, set_grades
@@ -125,7 +124,7 @@ def last_updated():
 
 
 def is_staff(remote):
-    if(dev_env):
+    if dev_env:
         return True
     token = session.get("dev_token") or request.cookies.get("dev_token")
     ret = remote.get("user", token=token)
@@ -272,22 +271,21 @@ def create_client(app):
 
     @app.route("/setConfig", methods=["POST"])
     def set_config():
-        print("set config c")
         if not is_staff(remote):
             return jsonify({"success": False})
         data = request.form.get("data")
         with connect_db() as db:
             db("DELETE FROM configs WHERE courseCode=%s", [get_course_code()])
             db("INSERT INTO configs VALUES (%s, %s)", [get_course_code(), data])
-        print("data ", data, type(data))
         return jsonify({"success": True})
 
     @app.route("/setGrades", methods=["POST"])
-    def set_grades():
+    def set_grades_route():
         if not is_staff(remote):
             return jsonify({"success": False})
         data = request.form.get("data")
-        set_grades(data, get_course_code())
+        with connect_db() as db:
+            set_grades(data, get_course_code(), db)
 
         return jsonify({"success": True})
 
@@ -330,11 +328,15 @@ def create_client(app):
 
     return remote
 
-def printToErr(printFunction):
+
+def print_to_stderr(printFunction):
     def print(*s):
         printFunction(*s, file=sys.stderr)
     return print
-print = printToErr(print)
+
+
+print = print_to_stderr(print)
+
 
 app = Flask(
     __name__, static_url_path="", static_folder="static", template_folder="static"
