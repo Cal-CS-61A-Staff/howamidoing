@@ -2,25 +2,16 @@ import React, { useState, useEffect, useMemo } from "react";
 import $ from "jquery";
 import _ from "lodash";
 
-import {
-    Histogram, BarSeries, withParentSize, XAxis, YAxis,
-} from "@data-ui/histogram";
-import { Dropdown, Row, Col } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 import { Slider } from "@material-ui/core";
+import Dropdown from "./Dropdown";
+import ScoreHistogram from "./ScoreHistogram";
 
 import StudentTable from "./StudentTable.js";
 
 import { getAssignmentLookup, getAssignments } from "./loadAssignments.js";
 import { extend } from "./StudentView";
 import computeTotals from "./computeTotals.js";
-
-const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest }) => (
-    <Histogram
-        width={parentWidth}
-        height={parentHeight}
-        {...rest}
-    />
-));
 
 const showScore = (score, rangeMin, rangeMax, TAToShow, TA) => (TAToShow === "All" || TAToShow === TA) && score <= rangeMax && score >= rangeMin;
 
@@ -69,7 +60,7 @@ export default function AssignmentDetails({ onLogin }) {
                 scores.map(x => Object.fromEntries(x.map((v, i) => [newHeader[i], v])))
             );
             const newData = addAssignmentTotals(
-                assignmentData, getAssignmentLookup(), getAssignments()
+                assignmentData, getAssignmentLookup(), getAssignments(),
             );
             setData(newData);
         });
@@ -77,7 +68,7 @@ export default function AssignmentDetails({ onLogin }) {
 
     const assignmentNames = Object.keys(assignments);
 
-    const [currentAssignmentName, setCurrentAssignmentName] = useState(assignmentNames[0]);
+    const currentAssignmentName = assignmentNames[assignmentIndex];
     const assignment = assignments[currentAssignmentName];
 
     const assignmentScores = useMemo(() => (data.map(
@@ -99,8 +90,7 @@ export default function AssignmentDetails({ onLogin }) {
         setRangeMax(bins[bins.length - 1]);
     }, [bins, defaultBins]);
 
-    const TAs = data.map(x => x.TA);
-    TAs.push("All");
+    const TAs = data.map(x => x.TA).concat(["All"]);
     const TANames = Array.from(new Set(TAs));
     const [TA, setTA] = useState("All");
     const students = data
@@ -111,100 +101,24 @@ export default function AssignmentDetails({ onLogin }) {
 
     const contents = (
         <>
-            <div style={{ height: "40vh" }}>
-                {students.length === 0
-                    || (
-                        <ResponsiveHistogram
-                            ariaLabel="Lab score histogram"
-                            orientation="vertical"
-                            cumulative={false}
-                            normalized
-                            valueAccessor={datum => datum}
-                            binType="numeric"
-                            binValues={bins}
-                            renderTooltip={({ datum, color }) => (
-                                <div>
-                                    <strong style={{ color }}>
-                                        {datum.bin0}
-                                        {" "}
-                                    to
-                                        {" "}
-                                        {datum.bin1}
-                                    </strong>
-                                    <div>
-                                        <strong>count </strong>
-                                        {datum.count}
-                                    </div>
-                                    <div>
-                                        <strong>cumulative </strong>
-                                        {datum.cumulative}
-                                    </div>
-                                    <div>
-                                        <strong>density </strong>
-                                        {datum.density}
-                                    </div>
-                                </div>
-                            )}
-                        >
-                            <BarSeries
-                                animated
-                                rawData={extractAssignmentData(
-                                    assignmentScores, assignmentIndex, TA, TAs, rangeMin, rangeMax,
-                                )}
-                            />
-                            <XAxis />
-                            <YAxis />
-                        </ResponsiveHistogram>
-                    )
-                }
-            </div>
+            <ScoreHistogram
+                students={students}
+                bins={bins}
+                extractedData={extractAssignmentData(
+                    assignmentScores, assignmentIndex, TA, TAs, rangeMin, rangeMax,
+                )}
+            />
             <Row>
-                <Col>
-                    <Dropdown>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic">
-                            {currentAssignmentName || "Choose assignment"}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            {
-                                assignmentNames.map((assignmentName, index) => (
-                                    <Dropdown.Item
-                                        key={assignmentName}
-                                        onClick={() => {
-                                            setAssignmentIndex(index);
-                                            setCurrentAssignmentName(assignmentName);
-                                        }}
-                                    >
-                                        {assignmentName}
-                                    </Dropdown.Item>
-                                ))
-                            }
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Col>
-                <Col>
-                    <Dropdown>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic">
-                            {TA}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            {
-                                TANames.map(TAName => (
-                                    <Dropdown.Item
-                                        key={TAName}
-                                        onClick={() => {
-                                            setTA(TAName);
-                                        }}
-                                    >
-                                        {TAName}
-                                    </Dropdown.Item>
-                                ))
-                            }
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Col>
+                <Dropdown value={currentAssignmentName} onChange={setAssignmentIndex}>
+                    {assignmentNames}
+                </Dropdown>
+                <Dropdown value={TA} onChange={i => setTA(TANames[i])}>
+                    {TANames}
+                </Dropdown>
             </Row>
             <Row>
                 <Col md={3}>
+                    Score Interval
                     <Slider
                         min={0}
                         max={bins[bins.length - 1] || 0}
