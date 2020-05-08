@@ -13,11 +13,8 @@ export default function StaffView({ students, onSubmit }) {
     return (
         <div>
             <Row>
-                <Col md="10">
+                <Col>
                     <StudentTargetSelector students={students} onSubmit={onSubmit} />
-                </Col>
-                <Col style={{ display: "flex", alignItems: "center" }}>
-                    <a className="btn btn-success text-white" href="/histogram"> View Histogram </a>
                 </Col>
             </Row>
             <UploadTargets />

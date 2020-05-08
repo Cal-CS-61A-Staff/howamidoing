@@ -78,16 +78,17 @@ export default function AssignmentDetails({ onLogin }) {
     )), [data, assignmentNames]);
 
     const maxScore = assignment.futureMaxScore || 0;
-    const binSize = maxScore / 20;
-    const defaultBins = [0, 1, 2, 3, 4, 5];
-    const bins = (assignment.futureMaxScore && assignment.futureMaxScore !== Infinity)
-        ? _.range(0, maxScore + 0.01, binSize) : defaultBins;
 
     const [rangeMin, setRangeMin] = useState(0);
-    const [rangeMax, setRangeMax] = useState(bins[bins.length - 1]);
+    const [rangeMax, setRangeMax] = useState(maxScore);
+
+    const binSize = (rangeMax - rangeMin) / 20;
+    const defaultBins = [0, 1, 2, 3, 4, 5];
+    const bins = (assignment.futureMaxScore && assignment.futureMaxScore !== Infinity)
+        ? _.range(rangeMin, rangeMax + 0.01, binSize) : defaultBins;
 
     useEffect(() => {
-        setRangeMax(bins[bins.length - 1]);
+        setRangeMax(Math.min(rangeMax, bins[bins.length - 1]));
     }, [assignment]);
 
     const TAs = data.map(x => x.TA).concat(["All"]);
