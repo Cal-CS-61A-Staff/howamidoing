@@ -29,4 +29,4 @@ yarn-error.log*
 **/*grades.csv
 secrets.py
 
-.idea/workspace.iml
+/.idea/
