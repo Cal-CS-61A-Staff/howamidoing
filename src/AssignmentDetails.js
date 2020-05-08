@@ -36,14 +36,14 @@ const addAssignmentTotals = (data, assignments, topics) => {
     for (let student = 0; student < data.length; ++student) {
         let scores = {};
         const header = data[student];
-        for (const title of header) {
+        for (const title of Object.keys(header)) {
             if (assignments[title]) {
                 scores[title] = header[title];
             }
         }
         scores = extend(scores, assignments);
         const totals = computeTotals(topics, scores, false);
-        for (const assignment of totals) {
+        for (const assignment of Object.keys(totals)) {
             header[assignment] = totals[assignment];
         }
     }
