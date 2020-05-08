@@ -63,7 +63,7 @@ export default function AssignmentDetails({ onLogin }) {
     useEffect(() => {
         $.post("/allScores").done(({ header: newHeader, scores }) => {
             setHeader(newHeader);
-            setData(scores.map(x => Object.fromEntries(x.map((v, i) => [header[i], v]))));
+            setData(scores.map(x => Object.fromEntries(x.map((v, i) => [newHeader[i], v]))));
         });
     }, []);
     window.setSchema(header, []);
