@@ -5,10 +5,11 @@
   "proxy": "http://localhost:8000",
   "dependencies": {
     "concurrently": "^5.1.0",
+    "lodash": "latest",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.17",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1", "lodash": "latest"
+    "react-scripts": "3.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@data-ui/histogram": "^0.0.81",
+    "@material-ui/core": "^4.9.13",
     "bootstrap": "^4.3.1",
     "eslint-config-airbnb": "^17.1.1",
     "jquery": "^3.4.1",
@@ -41,6 +43,6 @@
     "react-latex": "^1.4.0",
     "react-select2-wrapper": "^1.0.4-beta6",
     "shipit-cli": "^5.0.0",
-    "shipit-deploy": "^5.0.0"
+    "shipit-deploy": "^5.0.0", "@material-ui/core": "latest", "react-bootstrap": "latest"
   }
 }
