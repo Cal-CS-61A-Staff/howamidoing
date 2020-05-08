@@ -57,26 +57,23 @@ const updateBins = (value, setRangeMin, setRangeMax) => {
 export default function AssignmentDetails({ onLogin }) {
     const [data, setData] = useState([]);
     const [assignmentIndex, setAssignmentIndex] = useState(0);
-    const [header, setHeader] = useState([]);
 
-    window.setSchema(header, []);
+    window.setSchema([], []);
+
     const assignments = getAssignmentLookup();
-    const topics = getAssignments();
 
     useEffect(() => {
         $.post("/allScores").done(({ header: newHeader, scores }) => {
-            setHeader(newHeader);
+            window.setSchema(newHeader, []);
             const assignmentData = (
                 scores.map(x => Object.fromEntries(x.map((v, i) => [newHeader[i], v])))
             );
-            console.log(topics);
-            const newData = addAssignmentTotals(assignmentData, assignments, topics);
-            console.log(newData);
+            const newData = addAssignmentTotals(
+                assignmentData, getAssignmentLookup(), getAssignments()
+            );
             setData(newData);
         });
     }, []);
-
-    console.log(data);
 
     const assignmentNames = Object.keys(assignments);
 
