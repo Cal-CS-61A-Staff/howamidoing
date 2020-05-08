@@ -77,10 +77,10 @@ export default function AssignmentDetails({ onLogin }) {
             .map(x => Number.parseFloat(x)),
     )), [data, assignmentNames]);
 
-    const maxScore = assignment.maxScore || 0;
-    const binSize = maxScore / 4;
+    const maxScore = assignment.futureMaxScore || 0;
+    const binSize = maxScore / 20;
     const defaultBins = [0, 1, 2, 3, 4, 5];
-    const bins = (assignment.maxScore && assignment.maxScore !== Infinity)
+    const bins = (assignment.futureMaxScore && assignment.futureMaxScore !== Infinity)
         ? _.range(0, maxScore + 0.01, binSize) : defaultBins;
 
     const [rangeMin, setRangeMin] = useState(0);
@@ -88,7 +88,7 @@ export default function AssignmentDetails({ onLogin }) {
 
     useEffect(() => {
         setRangeMax(bins[bins.length - 1]);
-    }, [bins, defaultBins]);
+    }, [assignment]);
 
     const TAs = data.map(x => x.TA).concat(["All"]);
     const TANames = Array.from(new Set(TAs));
@@ -118,7 +118,6 @@ export default function AssignmentDetails({ onLogin }) {
             </Row>
             <Row>
                 <Col md={3}>
-                    Score Interval
                     <Slider
                         min={0}
                         max={bins[bins.length - 1] || 0}
