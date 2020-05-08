@@ -43,6 +43,7 @@
     "react-latex": "^1.4.0",
     "react-select2-wrapper": "^1.0.4-beta6",
     "shipit-cli": "^5.0.0",
-    "shipit-deploy": "^5.0.0", "@material-ui/core": "latest", "react-bootstrap": "latest"
+    "shipit-deploy": "^5.0.0",
+    "react-bootstrap": "latest"
   }
 }
