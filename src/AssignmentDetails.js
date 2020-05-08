@@ -1,96 +1,135 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-    Histogram, BarSeries, withParentSize, XAxis, YAxis,
-} from "@data-ui/histogram";
 import $ from "jquery";
-import BinSelectors from "./BinSelectors.js";
+import _ from "lodash";
+
+import { Row, Col } from "react-bootstrap";
+import { Slider } from "@material-ui/core";
+import Dropdown from "./Dropdown";
+import ScoreHistogram from "./ScoreHistogram";
+
 import StudentTable from "./StudentTable.js";
 
-const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest }) => (
-    <Histogram
-        width={parentWidth}
-        height={parentHeight}
-        {...rest}
-    />
-));
+import { getAssignmentLookup, getAssignments } from "./loadAssignments.js";
+import { extend } from "./StudentView";
+import computeTotals from "./computeTotals.js";
+
+const showScore = (score, rangeMin, rangeMax, TAToShow, TA) => (TAToShow === "All" || TAToShow === TA) && score <= rangeMax && score >= rangeMin;
+
+const extractAssignmentData = (arr, index, TA, TAs, rangeMin, rangeMax) => (
+    arr.map(scores => scores[index]).filter(
+        (score, i) => showScore(score, rangeMin, rangeMax, TA, TAs[i]),
+    )
+);
+
+// note: mutates data
+const addAssignmentTotals = (data, assignments, topics) => {
+    for (let student = 0; student < data.length; ++student) {
+        let scores = {};
+        const header = data[student];
+        for (const title of Object.keys(header)) {
+            if (assignments[title]) {
+                scores[title] = header[title];
+            }
+        }
+        scores = extend(scores, assignments);
+        const totals = computeTotals(topics, scores, false);
+        for (const assignment of Object.keys(totals)) {
+            header[assignment] = totals[assignment];
+        }
+    }
+    return data;
+};
+
+const updateBins = (value, setRangeMin, setRangeMax) => {
+    setRangeMin(value[0]);
+    setRangeMax(value[1]);
+};
 
 export default function AssignmentDetails({ onLogin }) {
     const [data, setData] = useState([]);
+    const [assignmentIndex, setAssignmentIndex] = useState(0);
+
+    window.setSchema([], []);
+
+    const assignments = useMemo(getAssignmentLookup, [data]);
 
     useEffect(() => {
-        $.post("/allScores").done(({ header, scores }) => {
-            setData(scores.map(x => Object.fromEntries(x.map((v, i) => [header[i], v]))));
+        $.post("/allScores").done(({ header: newHeader, scores }) => {
+            window.setSchema(newHeader, []);
+            const assignmentData = (
+                scores.map(x => Object.fromEntries(x.map((v, i) => [newHeader[i], v])))
+            );
+            const newData = addAssignmentTotals(
+                assignmentData, getAssignmentLookup(), getAssignments(),
+            );
+            setData(newData);
         });
     }, []);
 
-    const labs = ["Imaging 1_in-person", "Imaging 2_in-person", "Imaging 3_in-person", "Touchscreen 1_in-person", "Touchscreen 2_in-person", "Touchscreen 3A_in-person", "Touchscreen 3B_in-person", "APS 1_in-person", "APS 2_in-person", "Imaging 1_remote", "Imaging 2_remote", "Imaging 3_remote", "Touchscreen 1_remote", "Touchscreen 2_remote", "Touchscreen 3A_remote", "Touchscreen 3B_remote", "APS 1_remote", "APS 2_remote"];
+    const assignmentNames = Object.keys(assignments);
+
+    const currentAssignmentName = assignmentNames[assignmentIndex];
+    const assignment = assignments[currentAssignmentName];
 
     const assignmentScores = useMemo(() => (data.map(
-        student => labs
-            .map(lab => student[lab] || 0)
-            .map(x => Number.parseInt(x, 10))
-            .reduce((x, y) => x + y),
-    )), [data, labs]);
+        student => assignmentNames
+            .map(assignmentName => student[assignmentName] || 0)
+            .map(x => Number.parseFloat(x)),
+    )), [data, assignmentNames]);
 
+    const maxScore = assignment.futureMaxScore || 0;
 
-    const bins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const [rangeMin, setRangeMin] = useState(0);
+    const [rangeMax, setRangeMax] = useState(maxScore);
 
-    const [toggled, setToggled] = useState(bins.map(() => false));
+    const binSize = (rangeMax - rangeMin) / 20;
+    const defaultBins = [0, 1, 2, 3, 4, 5];
+    const bins = (assignment.futureMaxScore && assignment.futureMaxScore !== Infinity)
+        ? _.range(rangeMin, rangeMax + 0.01, binSize) : defaultBins;
 
-    const handleToggle = (i) => {
-        toggled[i] = !toggled[i];
-        setToggled(toggled.slice());
-    };
+    useEffect(() => {
+        setRangeMax(Math.min(rangeMax, bins[bins.length - 1]));
+    }, [assignmentIndex]);
 
+    const TAs = data.map(x => x.TA).concat(["All"]);
+    const TANames = Array.from(new Set(TAs));
+    const [TA, setTA] = useState("All");
     const students = data
-        .map((x, i) => ({
-            ...x, Score: assignmentScores[i],
+        .map((x, student) => ({
+            ...x, Score: assignmentScores[student][assignmentIndex],
         }))
-        .filter(({ Score }) => toggled[Score]);
+        .filter(student => showScore(student.Score, rangeMin, rangeMax, TA, student.TA));
 
     const contents = (
         <>
-            <div style={{ height: "40vh" }}>
-                <ResponsiveHistogram
-                    ariaLabel="Lab score histogram"
-                    orientation="vertical"
-                    cumulative={false}
-                    normalized
-                    valueAccessor={datum => datum}
-                    binType="categorical"
-                    renderTooltip={({ datum, color }) => (
-                        <div>
-                            <strong style={{ color }}>
-                                {datum.bin0}
-                                {" "}
-                                to
-                                {" "}
-                                {datum.bin1}
-                            </strong>
-                            <div>
-                                <strong>count </strong>
-                                {datum.count}
-                            </div>
-                            <div>
-                                <strong>cumulative </strong>
-                                {datum.cumulative}
-                            </div>
-                            <div>
-                                <strong>density </strong>
-                                {datum.density}
-                            </div>
-                        </div>
-                    )}
-                >
-                    <BarSeries
-                        animated
-                        rawData={assignmentScores}
+            <ScoreHistogram
+                students={students}
+                bins={bins}
+                extractedData={extractAssignmentData(
+                    assignmentScores, assignmentIndex, TA, TAs, rangeMin, rangeMax,
+                )}
+            />
+            <Row>
+                <Dropdown value={currentAssignmentName} onChange={setAssignmentIndex}>
+                    {assignmentNames}
+                </Dropdown>
+                <Dropdown value={TA} onChange={i => setTA(TANames[i])}>
+                    {TANames}
+                </Dropdown>
+            </Row>
+            <Row>
+                <Col md={3}>
+                    <Slider
+                        min={0}
+                        max={(assignment.futureMaxScore && assignment.futureMaxScore !== Infinity)
+                            ? assignment.futureMaxScore : 0
+                        }
+                        value={[rangeMin, rangeMax]}
+                        valueLabelDisplay="auto"
+                        onChange={(__, values) => updateBins(values, setRangeMin, setRangeMax)}
                     />
-                    <XAxis />
-                    <YAxis />
-                </ResponsiveHistogram>
-            </div>
-            <BinSelectors bins={bins} toggled={toggled} onToggle={handleToggle} />
+                </Col>
+            </Row>
             <StudentTable students={students} onLogin={onLogin} />
         </>
     );

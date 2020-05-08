@@ -10,35 +10,24 @@ import GradePlanner from "./GradePlanner.js";
 import FutureCheckBox from "./FutureCheckBox.js";
 import computeTotals from "./computeTotals.js";
 
+import { getAssignmentLookup, getAssignments } from "./loadAssignments.js";
+
 let ASSIGNMENTS = [];
 
 let LOOKUP = {};
 
 let setSchema;
-let createAssignments;
 
-function initialize(header, scores) {
-    ({ setSchema, createAssignments } = window);
+const initialize = (header, scores) => {
+    ({ setSchema } = window);
     setSchema(header, scores);
-    ASSIGNMENTS = createAssignments();
-    LOOKUP = {};
-    for (const assignment of ASSIGNMENTS) {
-        initializeLookup(assignment);
-    }
+    LOOKUP = getAssignmentLookup();
+    ASSIGNMENTS = getAssignments();
 }
 
-function initializeLookup(assignment) {
-    LOOKUP[assignment.name] = assignment;
-    if (assignment.isTopic) {
-        for (const child of assignment.children) {
-            initializeLookup(child);
-        }
-    }
-}
-
-function extend(scores) {
+export const extend = (scores, lookup) => {
     const out = JSON.parse(JSON.stringify(scores));
-    for (const key of Object.keys(LOOKUP)) {
+    for (const key of Object.keys(lookup)) {
         if (out[key] === undefined) {
             out[key] = NaN;
         }
@@ -61,7 +50,7 @@ class StudentView extends Component {
 
         this.state = {
             scores,
-            plannedScores: extend(scores),
+            plannedScores: extend(scores, LOOKUP),
             future: false,
         };
     }
@@ -98,7 +87,7 @@ class StudentView extends Component {
     };
 
     render() {
-        const scores = extend(this.state.scores);
+        const scores = extend(this.state.scores, LOOKUP);
 
         if (this.state.future) {
             for (const elem of Object.values(LOOKUP)) {

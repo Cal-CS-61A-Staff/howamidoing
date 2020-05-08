@@ -23,7 +23,6 @@ export default (assignments, scores, future) => {
                 ? parse(scores[curr.name]) : NaN;
             return totals[curr.name];
         }
-
         const childTotals = [];
 
         let out = 0;
@@ -37,7 +36,6 @@ export default (assignments, scores, future) => {
         }
 
         childTotals.reverse();
-
         if (curr.customCalculator) {
             out = curr.customCalculator(childTotals, future);
         }
@@ -55,11 +53,11 @@ export default (assignments, scores, future) => {
             totals[curr.name] = Number.parseFloat(scores[curr.name]);
             return totals[curr.name];
         }
-
         return out;
     };
     for (const assignment of assignments) {
         computeTotals(assignment);
     }
+
     return totals;
 };

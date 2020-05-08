@@ -21,7 +21,8 @@ export default function StudentTargetSelector({ onSubmit, students }) {
                     data={students}
                 />
             </div>
-            <button type="submit" className="btn btn-primary">Submit</button>
+            <button type="submit" className="btn btn-primary" style={{ marginRight: "10px" }}>Submit</button>
+            <a className="btn btn-success text-white" href="/histogram"> View Histogram </a>
         </form>
     );
 }
