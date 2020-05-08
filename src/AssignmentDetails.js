@@ -60,7 +60,7 @@ export default function AssignmentDetails({ onLogin }) {
 
     window.setSchema([], []);
 
-    const assignments = getAssignmentLookup();
+    const assignments = useMemo(getAssignmentLookup, [data]);
 
     useEffect(() => {
         $.post("/allScores").done(({ header: newHeader, scores }) => {
