@@ -89,7 +89,7 @@ export default function AssignmentDetails({ onLogin }) {
 
     useEffect(() => {
         setRangeMax(Math.min(rangeMax, bins[bins.length - 1]));
-    }, [assignment]);
+    }, [assignmentIndex]);
 
     const TAs = data.map(x => x.TA).concat(["All"]);
     const TANames = Array.from(new Set(TAs));
@@ -121,7 +121,9 @@ export default function AssignmentDetails({ onLogin }) {
                 <Col md={3}>
                     <Slider
                         min={0}
-                        max={bins[bins.length - 1] || 0}
+                        max={(assignment.futureMaxScore && assignment.futureMaxScore !== Infinity)
+                            ? assignment.futureMaxScore : 0
+                        }
                         value={[rangeMin, rangeMax]}
                         valueLabelDisplay="auto"
                         onChange={(__, values) => updateBins(values, setRangeMin, setRangeMax)}
