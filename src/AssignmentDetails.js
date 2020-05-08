@@ -30,9 +30,8 @@ const extractAssignmentData = (arr, index, TA, TAs, rangeMin, rangeMax) => (
     )
 );
 
+// note: mutates data
 const addAssignmentTotals = (data, assignments, topics) => {
-    // eslint-disable-next-line no-param-reassign
-    data = JSON.parse(JSON.stringify(data));
     for (let student = 0; student < data.length; ++student) {
         let scores = {};
         const header = data[student];
@@ -60,31 +59,35 @@ export default function AssignmentDetails({ onLogin }) {
     const [assignmentIndex, setAssignmentIndex] = useState(0);
     const [header, setHeader] = useState([]);
 
+    window.setSchema(header, []);
+    const assignments = getAssignmentLookup();
+    const topics = getAssignments();
+
     useEffect(() => {
         $.post("/allScores").done(({ header: newHeader, scores }) => {
             setHeader(newHeader);
-            setData(scores.map(x => Object.fromEntries(x.map((v, i) => [newHeader[i], v]))));
+            const assignmentData = (
+                scores.map(x => Object.fromEntries(x.map((v, i) => [newHeader[i], v])))
+            );
+            console.log(topics);
+            const newData = addAssignmentTotals(assignmentData, assignments, topics);
+            console.log(newData);
+            setData(newData);
         });
     }, []);
-    window.setSchema(header, []);
 
-    const assignments = getAssignmentLookup();
-    const topics = getAssignments();
+    console.log(data);
+
     const assignmentNames = Object.keys(assignments);
 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(assignmentNames[0]);
-    const [assignment, setAssignment] = useState(assignments[currentAssignmentName]);
+    const assignment = assignments[currentAssignmentName];
 
     const assignmentScores = useMemo(() => (data.map(
         student => assignmentNames
             .map(assignmentName => student[assignmentName] || 0)
             .map(x => Number.parseFloat(x)),
     )), [data, assignmentNames]);
-
-    useEffect(() => {
-        setData(addAssignmentTotals(data, assignments, topics));
-        setAssignment(assignments[currentAssignmentName]);
-    }, [data.length === 0]);
 
     const maxScore = assignment.maxScore || 0;
     const binSize = maxScore / 4;
@@ -97,10 +100,9 @@ export default function AssignmentDetails({ onLogin }) {
 
     useEffect(() => {
         setRangeMax(bins[bins.length - 1]);
-    }, [bins === defaultBins]);
+    }, [bins, defaultBins]);
 
-    const TAs = data
-        .map(x => x.TA);
+    const TAs = data.map(x => x.TA);
     TAs.push("All");
     const TANames = Array.from(new Set(TAs));
     const [TA, setTA] = useState("All");
@@ -168,11 +170,12 @@ export default function AssignmentDetails({ onLogin }) {
                         <Dropdown.Menu>
                             {
                                 assignmentNames.map((assignmentName, index) => (
-                                    <Dropdown.Item onClick={() => {
-                                        setAssignmentIndex(index);
-                                        setCurrentAssignmentName(assignmentName);
-                                        setAssignment(assignments[assignmentName]);
-                                    }}
+                                    <Dropdown.Item
+                                        key={assignmentName}
+                                        onClick={() => {
+                                            setAssignmentIndex(index);
+                                            setCurrentAssignmentName(assignmentName);
+                                        }}
                                     >
                                         {assignmentName}
                                     </Dropdown.Item>
@@ -189,9 +192,11 @@ export default function AssignmentDetails({ onLogin }) {
                         <Dropdown.Menu>
                             {
                                 TANames.map(TAName => (
-                                    <Dropdown.Item onClick={() => {
-                                        setTA(TAName);
-                                    }}
+                                    <Dropdown.Item
+                                        key={TAName}
+                                        onClick={() => {
+                                            setTA(TAName);
+                                        }}
                                     >
                                         {TAName}
                                     </Dropdown.Item>
