@@ -3,6 +3,9 @@ import os
 import urllib.parse
 from contextlib import contextmanager
 import sys
+
+from cachetools import TTLCache
+
 from setup_functions import set_default_config, set_grades
 
 from werkzeug import security
@@ -24,11 +27,15 @@ from sqlalchemy import create_engine
 CONSUMER_KEY = "61a-grade-view"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-GRADES_PATH = os.path.join(BASE_DIR, "grades.csv")
 
 AUTHORIZED_ROLES = ["staff", "instructor"]
 
+DOMAIN_COURSES = TTLCache(1000, 1800)
+COURSE_ENDPOINTS = TTLCache(1000, 1800)
+ENDPOINT_ID = TTLCache(1000, 1800)
+
 dev_env = "gunicorn" not in os.environ.get("SERVER_SOFTWARE", "")
+
 
 @contextmanager
 def connect_db():
@@ -87,29 +94,25 @@ if dev_env:
             set_grades(grades.read(), "cs61a", db)
         set_default_config(db)
 
-def get_course_code():
-    try:
-        with open("static/config/courseList.json") as config:
-            data = json.load(config)
-            host = request.headers["Host"]
-            for code, info in data.items():
-                if host in info["domains"]:
-                    return code
-            return "cs61a"
-    except FileNotFoundError:
+
+def get_course_code(domain=None):
+    if os.getenv("ENV") != "prod":
         return "cs61a"
+    if not domain:
+        domain = request.headers["HOST"]
+    if domain not in DOMAIN_COURSES:
+        DOMAIN_COURSES[domain] = requests.post("https://auth.apps.cs61a.org/domains/get_course", json={
+            "domain": domain
+        }).json()
+    return DOMAIN_COURSES[domain]
 
 
-def get_course():
-    try:
-        with open("static/config/courseList.json") as config:
-            data = json.load(config)
-            return data[get_course_code()]
-    except FileNotFoundError:
-        return {
-            "domains": ["localhost"],
-            "endpoint": "cal/cs61a/fa19"
-        }
+def get_endpoint(course=None):
+    if not course:
+        course = get_course_code()
+    if course not in COURSE_ENDPOINTS:
+        COURSE_ENDPOINTS[course] = requests.post("https://auth.apps.cs61a.org/api/{}/get_endpoint".format(course)).json()
+    return COURSE_ENDPOINTS[course]
 
 
 def last_updated():
@@ -131,7 +134,7 @@ def is_staff(remote):
     for course in ret.data["data"]["participations"]:
         if course["role"] not in AUTHORIZED_ROLES:
             continue
-        if course["course"]["offering"] != get_course()["endpoint"]:
+        if course["course"]["offering"] != get_endpoint():
             continue
         return True
     return False

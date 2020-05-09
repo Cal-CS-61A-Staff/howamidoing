@@ -5,3 +5,4 @@ flask_oauthlib
 gunicorn
 SQLAlchemy
 mysqlclient
+cachetools==4.0.0
