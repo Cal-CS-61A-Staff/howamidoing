@@ -28,7 +28,7 @@ CONSUMER_KEY = "61a-grade-view"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-AUTHORIZED_ROLES = ["staff", "instructor"]
+AUTHORIZED_ROLES = ["staff", "instructor", "grader"]
 
 DOMAIN_COURSES = TTLCache(1000, 1800)
 COURSE_ENDPOINTS = TTLCache(1000, 1800)
@@ -54,6 +54,7 @@ def connect_db():
                     conn.execute(args[0], data, *args[2:])
 
         yield db
+
 
 if dev_env:
     # for mysql, use "mysql://localhost/statuscheck"
@@ -111,7 +112,8 @@ def get_endpoint(course=None):
     if not course:
         course = get_course_code()
     if course not in COURSE_ENDPOINTS:
-        COURSE_ENDPOINTS[course] = requests.post("https://auth.apps.cs61a.org/api/{}/get_endpoint".format(course)).json()
+        COURSE_ENDPOINTS[course] = requests.post(
+            "https://auth.apps.cs61a.org/api/{}/get_endpoint".format(course)).json()
     return COURSE_ENDPOINTS[course]
 
 
@@ -147,7 +149,8 @@ def create_client(app):
         "ok-server",  # Server Name
         consumer_key=CONSUMER_KEY,
         consumer_secret=SECRET,
-        request_token_params={"scope": "all", "state": lambda: security.gen_salt(10)},
+        request_token_params={"scope": "all",
+                              "state": lambda: security.gen_salt(10)},
         base_url="https://okpy.org/api/v3/",
         request_token_url=None,
         access_token_method="POST",
@@ -185,7 +188,8 @@ def create_client(app):
     def config():
         with connect_db() as db:
             data = db(
-                "SELECT config FROM configs WHERE courseCode=%s", [get_course_code()]
+                "SELECT config FROM configs WHERE courseCode=%s", [
+                    get_course_code()]
             ).fetchone()
             print(data)
             return Response(data, mimetype="application/javascript")
@@ -260,7 +264,8 @@ def create_client(app):
             return jsonify({"success": False})
         with connect_db() as db:
             [header] = db(
-                "SELECT header FROM headers WHERE courseCode=%s", [get_course_code()]
+                "SELECT header FROM headers WHERE courseCode=%s", [
+                    get_course_code()]
             ).fetchone()
             header = json.loads(header)
             data = db(
@@ -279,7 +284,8 @@ def create_client(app):
         data = request.form.get("data")
         with connect_db() as db:
             db("DELETE FROM configs WHERE courseCode=%s", [get_course_code()])
-            db("INSERT INTO configs VALUES (%s, %s)", [get_course_code(), data])
+            db("INSERT INTO configs VALUES (%s, %s)",
+               [get_course_code(), data])
         return jsonify({"success": True})
 
     @app.route("/setGrades", methods=["POST"])
