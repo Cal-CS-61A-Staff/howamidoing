@@ -1,3 +1,6 @@
+# Archived Repo
+This repo has been merged into https://github.com/Cal-CS-61A-Staff/cs61a-apps/, and has been archived.
+
 # EECS Grade Display Tool
 
 This is a tool meant to display and forecast grades for lower-div EECS classes at UC Berkeley. To deploy, run `yarn build && yarn deploy`.
